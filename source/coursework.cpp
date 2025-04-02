@@ -93,7 +93,7 @@ int main(void)
     // Compile shader program
     unsigned int shaderID, lightShaderID;
     shaderID = LoadShaders("vertexShader.glsl", "fragmentShader.glsl");
-    //lightShaderID = LoadShaders("lightVertexShader.glsl", "lightFragmentShader.glsl");
+    lightShaderID = LoadShaders("lightVertexShader.glsl", "lightFragmentShader.glsl");
 
     // Activate shader
     glUseProgram(shaderID);
@@ -101,6 +101,7 @@ int main(void)
     // Load models
     Model cube("../assets/cube.obj");
     Model sphere("../assets/sphere.obj");
+
 
     // Load the textures
     cube.addTexture("../assets/crate.jpg", "diffuse");
@@ -118,22 +119,118 @@ int main(void)
 
     // Cube positions
     glm::vec3 positions[] = {
-        glm::vec3(0.0f,  0.0f,  0.0f),
-
+        glm::vec3(0.0f,  0.0f,  -5.0f),
+        glm::vec3(0.0f,  0.0f,  -4.0f),
+        glm::vec3(0.0f,  1.0f,  -4.0f),
+        glm::vec3(0.0f,  0.0f,  -3.0f),
+        glm::vec3(1.0f,  0.0f,  -4.0f),
+        glm::vec3(0.0f,  1.0f,  -5.0f),
+        glm::vec3(0.0f,  2.0f,  -5.0f),
+        glm::vec3(1.0f,  0.0f,  -5.0f),
+        glm::vec3(1.0f,  1.0f,  -5.0f),
+        glm::vec3(2.0f,  0.0f,  -5.0f),
     };
 
-    // Add teapots to objects vector
+    // Add boxes to objects vector
     std::vector<Object> objects;
     Object object;
     object.name = "cube";
-    for (unsigned int i = 0; i < 1; i++)
+    for (unsigned int i = 0; i < 10; i++)
     {
         object.position = positions[i];
         object.rotation = glm::vec3(1.0f, 1.0f, 1.0f);
         object.scale = glm::vec3(0.5f, 0.5f, 0.5f);
-        object.angle = Maths::radians(20.0f * i);
+        object.angle = Maths::radians(0.0f);
         objects.push_back(object);
     }
+
+    // FLOOR
+
+    Model floor("../assets/plane.obj");
+    /*floor.addTexture("../assets/stones_diffuse.png", "diffuse");
+    floor.addTexture("../assets/stones_normal.png", "normal");*/
+    floor.addTexture("../assets/stones_specular.png", "specular");
+
+    // Define floor light properties
+    floor.ka = 0.2f;
+    floor.kd = 1.0f;
+    floor.ks = 1.0f;
+    floor.Ns = 20.0f;
+
+    object.position = glm::vec3(7.0f, -0.5f, 2.0f);
+    object.scale = glm::vec3(0.75f, 1.0f, 0.75f);
+    object.rotation = glm::vec3(0.0f, 1.0f, 0.0f);
+    object.angle = 0.0f;
+    object.name = "floor";
+    objects.push_back(object);
+
+    //WALL
+
+    Model wall("../assets/plane.obj");
+    wall.addTexture("../assets/bricks_diffuse.png", "diffuse");
+    //wall.addTexture("../assets/bricks_normal.png", "normal");
+    //wall.addTexture("../assets/bricks_specular.png", "specular");
+
+
+    // Define wall light properties
+    wall.ka = 0.2f;
+    wall.kd = 1.0f;
+    wall.ks = 1.0f;
+    wall.Ns = 20.0f;
+
+    //walls
+
+
+    object.name = "wall";
+    object.position = glm::vec3(7.0f, -4.5f, -5.5f);
+    object.scale = glm::vec3(0.75f, 0.25f, 0.75f);
+    object.rotation = glm::vec3(90.0f, 0.0f, 0.0f);
+    object.angle = Maths::radians(90.0f);
+    objects.push_back(object);
+
+    object.name = "wall";
+    object.position = glm::vec3(7.0f, -4.5f, 9.5f);
+    object.scale = glm::vec3(0.75f, 0.25f, 0.75f);
+    object.rotation = glm::vec3(-90.0f, 0.0f, 0.0f);
+    object.angle = Maths::radians(90.0f);
+    objects.push_back(object);
+
+    object.name = "wall";
+    object.position = glm::vec3(14.5f, -4.5f, 2.0f);
+    object.scale = glm::vec3(0.75f, 0.25f, 0.75f);
+    object.rotation = glm::vec3(0.0f, 0.0f, 90.0f);
+    object.angle = Maths::radians(90.0f);
+    objects.push_back(object);
+
+    object.name = "wall";
+    object.position = glm::vec3(-0.5f, -4.5f, 2.0f);
+    object.scale = glm::vec3(0.75f, 0.25f, 0.75f);
+    object.rotation = glm::vec3(0.0f, 0.0f, -90.0f);
+    object.angle = Maths::radians(90.0f);
+    objects.push_back(object);
+
+    //CEILING
+
+    Model ceiling("../assets/cube.obj");
+    ceiling.addTexture("../assets/stones_normal.png", "normal");
+
+
+    // Define wall light properties
+    ceiling.ka = 0.2f;
+    ceiling.kd = 1.0f;
+    ceiling.ks = 1.0f;
+    ceiling.Ns = 20.0f;
+
+    object.name = "ceiling";
+    object.position = glm::vec3(7.0f, 3.0f, 2.0f);
+    object.scale = glm::vec3(8.0f, 0.1f, 8.0f);
+    object.rotation = glm::vec3(0.0f, -1.0f, 0.0f);
+    objects.push_back(object);
+
+
+    //camera starting position
+    camera.eye.x = 3.0f;
+    camera.eye.z = 3.0f;
 
     // Render loop
     while (!glfwWindowShouldClose(window))
@@ -182,6 +279,15 @@ int main(void)
             // Draw the model
             if (objects[i].name == "cube")
                 cube.draw(shaderID);
+
+            if (objects[i].name == "floor")
+                floor.draw(shaderID);
+
+            if (objects[i].name == "wall")
+                wall.draw(shaderID);
+
+            if (objects[i].name == "ceiling")
+                ceiling.draw(shaderID);
         }
 
         // Draw light sources
@@ -204,6 +310,10 @@ int main(void)
 void keyboardInput(GLFWwindow* window)
 {
     int cameraMoveSpeed;
+
+    //prevents user from flying around
+    camera.eye.y = 1.0f;
+
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         cameraMoveSpeed = 10.0f;
     else
@@ -230,6 +340,7 @@ void mouseInput(GLFWwindow* window)
 {
     // Get mouse cursor position and reset to centre
     double xPos, yPos;
+
     glfwGetCursorPos(window, &xPos, &yPos);
     glfwSetCursorPos(window, 1024 / 2, 768 / 2);
 
@@ -237,7 +348,10 @@ void mouseInput(GLFWwindow* window)
     camera.yaw += 0.005f * float(xPos - 1024 / 2);
     camera.pitch += 0.005f * float(768 / 2 - yPos);
 
+
     // Calculate camera vectors from the yaw and pitch angles
     camera.calculateCameraVectors();
+
+    
 }
 

@@ -33,6 +33,8 @@ public:
 
 	static mat4 rotate(const float& angle, vec3 v);
 
+	static mat4 view(const mat4 translate, const mat4 rotate);
+
 	static Quaternion SLERP(const Quaternion q1, const Quaternion q2, const float t);
 };
 

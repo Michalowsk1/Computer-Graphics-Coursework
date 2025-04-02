@@ -31,6 +31,7 @@ mat4 Maths::rotate(const float& angle, vec3 v)
 	return q.matrix();
 }
 
+
 Quaternion::Quaternion() {}
 
 Quaternion::Quaternion(const float w, const float x, const float y, const float z)
