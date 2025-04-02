@@ -54,7 +54,7 @@ int main(void)
 
     // Open a window and create its OpenGL context
     GLFWwindow* window;
-    window = glfwCreateWindow(1024, 768, "Lab10 Quaternions", NULL, NULL);
+    window = glfwCreateWindow(2048, 1536, "Lab10 Quaternions", NULL, NULL);
 
     if (window == NULL) {
         fprintf(stderr, "Failed to open GLFW window.\n");
@@ -107,9 +107,9 @@ int main(void)
     cube.addTexture("../assets/crate.jpg", "diffuse");
 
     // Define cube object lighting properties
-    cube.ka = 1.0f;
-    cube.kd = 0.0f;
-    cube.ks = 0.0f;
+    cube.ka = 0.5f;
+    cube.kd = 1.0f;
+    cube.ks = 1.0f;
     cube.Ns = 20.0f;
 
     // Add light sources
@@ -147,12 +147,12 @@ int main(void)
     // FLOOR
 
     Model floor("../assets/plane.obj");
-    /*floor.addTexture("../assets/stones_diffuse.png", "diffuse");
-    floor.addTexture("../assets/stones_normal.png", "normal");*/
+    floor.addTexture("../assets/stones_diffuse.png", "diffuse");
+    floor.addTexture("../assets/stones_normal.png", "normal");
     floor.addTexture("../assets/stones_specular.png", "specular");
 
     // Define floor light properties
-    floor.ka = 0.2f;
+    floor.ka = 0.5f;
     floor.kd = 1.0f;
     floor.ks = 1.0f;
     floor.Ns = 20.0f;
@@ -168,12 +168,12 @@ int main(void)
 
     Model wall("../assets/plane.obj");
     wall.addTexture("../assets/bricks_diffuse.png", "diffuse");
-    //wall.addTexture("../assets/bricks_normal.png", "normal");
-    //wall.addTexture("../assets/bricks_specular.png", "specular");
+    wall.addTexture("../assets/bricks_normal.png", "normal");
+    wall.addTexture("../assets/bricks_specular.png", "specular");
 
 
     // Define wall light properties
-    wall.ka = 0.2f;
+    wall.ka = 0.5f;
     wall.kd = 1.0f;
     wall.ks = 1.0f;
     wall.Ns = 20.0f;
@@ -184,28 +184,40 @@ int main(void)
     object.name = "wall";
     object.position = glm::vec3(7.0f, -4.5f, -5.5f);
     object.scale = glm::vec3(0.75f, 0.25f, 0.75f);
-    object.rotation = glm::vec3(90.0f, 0.0f, 0.0f);
+    object.rotation = glm::vec3(1.0f, 0.0f, 0.0f);
     object.angle = Maths::radians(90.0f);
     objects.push_back(object);
 
     object.name = "wall";
     object.position = glm::vec3(7.0f, -4.5f, 9.5f);
     object.scale = glm::vec3(0.75f, 0.25f, 0.75f);
-    object.rotation = glm::vec3(-90.0f, 0.0f, 0.0f);
+    object.rotation = glm::vec3(-1.0f, 0.0f, 0.0f);
     object.angle = Maths::radians(90.0f);
     objects.push_back(object);
 
-    object.name = "wall";
+    Model wallRotate("../assets/plane.obj");
+    wallRotate.addTexture("../assets/bricks_diffuse_Rotated.png", "diffuse");
+    wallRotate.addTexture("../assets/bricks_normal_Rotated.png", "normal");
+    wallRotate.addTexture("../assets/bricks_specular_Rotated.png", "specular");
+
+
+    // Define wall light properties
+    wallRotate.ka = 0.5f;
+    wallRotate.kd = 1.0f;
+    wallRotate.ks = 1.0f;
+    wallRotate.Ns = 20.0f;
+
+    object.name = "wallRotate";
     object.position = glm::vec3(14.5f, -4.5f, 2.0f);
     object.scale = glm::vec3(0.75f, 0.25f, 0.75f);
-    object.rotation = glm::vec3(0.0f, 0.0f, 90.0f);
+    object.rotation = glm::vec3(0.0f, 0.0f, 1.0f);
     object.angle = Maths::radians(90.0f);
     objects.push_back(object);
 
-    object.name = "wall";
+    object.name = "wallRotate";
     object.position = glm::vec3(-0.5f, -4.5f, 2.0f);
     object.scale = glm::vec3(0.75f, 0.25f, 0.75f);
-    object.rotation = glm::vec3(0.0f, 0.0f, -90.0f);
+    object.rotation = glm::vec3(0.0f, 0.0f, -1.0f);
     object.angle = Maths::radians(90.0f);
     objects.push_back(object);
 
@@ -216,7 +228,7 @@ int main(void)
 
 
     // Define wall light properties
-    ceiling.ka = 0.2f;
+    ceiling.ka = 0.5f;
     ceiling.kd = 1.0f;
     ceiling.ks = 1.0f;
     ceiling.Ns = 20.0f;
@@ -285,6 +297,9 @@ int main(void)
 
             if (objects[i].name == "wall")
                 wall.draw(shaderID);
+
+            if (objects[i].name == "wallRotate")
+                wallRotate.draw(shaderID);
 
             if (objects[i].name == "ceiling")
                 ceiling.draw(shaderID);
