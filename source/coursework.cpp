@@ -54,7 +54,7 @@ int main(void)
 
     // Open a window and create its OpenGL context
     GLFWwindow* window;
-    window = glfwCreateWindow(2048, 1536, "Lab10 Quaternions", NULL, NULL);
+    window = glfwCreateWindow(1024, 768, "Coursework", NULL, NULL);
 
     if (window == NULL) {
         fprintf(stderr, "Failed to open GLFW window.\n");
@@ -107,9 +107,9 @@ int main(void)
     cube.addTexture("../assets/crate.jpg", "diffuse");
 
     // Define cube object lighting properties
-    cube.ka = 0.5f;
-    cube.kd = 1.0f;
-    cube.ks = 1.0f;
+    cube.ka = 0.2f;
+    cube.kd = 0.5f;
+    cube.ks = 0.5f;
     cube.Ns = 20.0f;
 
     // Add light sources
@@ -152,9 +152,9 @@ int main(void)
     floor.addTexture("../assets/stones_specular.png", "specular");
 
     // Define floor light properties
-    floor.ka = 0.5f;
-    floor.kd = 1.0f;
-    floor.ks = 1.0f;
+    floor.ka = 0.2f;
+    floor.kd = 0.5f;
+    floor.ks = 0.5f;
     floor.Ns = 20.0f;
 
     object.position = glm::vec3(7.0f, -0.5f, 2.0f);
@@ -173,9 +173,9 @@ int main(void)
 
 
     // Define wall light properties
-    wall.ka = 0.5f;
-    wall.kd = 1.0f;
-    wall.ks = 1.0f;
+    wall.ka = 0.2f;
+    wall.kd = 0.5f;
+    wall.ks = 0.5f;
     wall.Ns = 20.0f;
 
     //walls
@@ -202,9 +202,9 @@ int main(void)
 
 
     // Define wall light properties
-    wallRotate.ka = 0.5f;
-    wallRotate.kd = 1.0f;
-    wallRotate.ks = 1.0f;
+    wallRotate.ka = 0.2f;
+    wallRotate.kd = 0.5f;
+    wallRotate.ks = 0.5f;
     wallRotate.Ns = 20.0f;
 
     object.name = "wallRotate";
@@ -228,9 +228,9 @@ int main(void)
 
 
     // Define wall light properties
-    ceiling.ka = 0.5f;
-    ceiling.kd = 1.0f;
-    ceiling.ks = 1.0f;
+    ceiling.ka = 0.2f;
+    ceiling.kd = 0.5f;
+    ceiling.ks = 0.5f;
     ceiling.Ns = 20.0f;
 
     object.name = "ceiling";
