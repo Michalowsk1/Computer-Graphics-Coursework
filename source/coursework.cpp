@@ -32,6 +32,20 @@ struct Object
     std::string name;
 };
 
+// Light struct
+struct Light
+{
+    glm::vec3 position;
+    glm::vec3 colour;
+    float constant;
+    float linear;
+    float quadratic;
+    unsigned int type;
+};
+
+// Create vector of light sources
+std::vector<Light> lightSources;
+
 int main(void)
 {
     // =========================================================================
@@ -92,7 +106,7 @@ int main(void)
 
     // Compile shader program
     unsigned int shaderID, lightShaderID;
-    shaderID = LoadShaders("vertexShader.glsl", "fragmentShader.glsl");
+    shaderID = LoadShaders("vertexShader.glsl", "multipleLightsFragmentShader.glsl");
     lightShaderID = LoadShaders("lightVertexShader.glsl", "lightFragmentShader.glsl");
 
     // Activate shader
@@ -251,9 +265,9 @@ int main(void)
 
     // Add light sources
     Light lightSources;
-    lightSources.addPointLight(lightPosition,                       // position
-                               lightColour,                         // colour
-                               1.0f, 0.2f, 0.02f);                  // attenuation
+    //lightSources.addPointLight(lightPosition,                       // position
+    //                           lightColour,                         // colour
+    //                           0.5f, 0.2f, 0.02f);                  // attenuation
 
         //lightSources.addSpotLight(glm::vec3(2.0f, 2.0f, 2.0f),          // position
         //                      glm::vec3(0.0f, -1.0f, 0.0f),         // direction
@@ -261,7 +275,19 @@ int main(void)
         //                      1.0f, 0.1f, 0.02f,                    // attenuation
         //                      std::cos(Maths::radians(45.0f)));     // cos(phi)
 
-    
+    // Add first point light source
+    Light light;
+    light.position = glm::vec3(2.0f, 2.0f, 2.0f);
+    light.colour = glm::vec3(1.0f, 1.0f, 1.0f);
+    light.constant = 1.0f;
+    light.linear = 0.1f;
+    light.quadratic = 0.02f;
+    light.type = 1;
+    lightSources.push_back(light);
+
+    // Add second point light source
+    light.position = glm::vec3(1.0f, 1.0f, -8.0f);
+    lightSources.push_back(light);
     
 
     //camera starting position
@@ -292,15 +318,34 @@ int main(void)
         glUseProgram(shaderID);
 
         // Send light source properties to the shader
-        lightSources.toShader(shaderID, camera.view);
+        //lightSources.toShader(shaderID, camera.view);
 
-        // Send view matrix to the shader
-        glUniformMatrix4fv(glGetUniformLocation(shaderID, "V"), 1, GL_FALSE, &camera.view[0][0]);
+        //// Send view matrix to the shader
+        //glUniformMatrix4fv(glGetUniformLocation(shaderID, "V"), 1, GL_FALSE, &camera.view[0][0]);
 
-        glUniform1f(glGetUniformLocation(shaderID, "kd"), wall.kd);
-        glUniform3fv(glGetUniformLocation(shaderID, "lightColour"), 1, &lightColour[0]);
-        glm::vec3 viewSpaceLightPosition = glm::vec3(camera.view * glm::vec4(lightPosition, 1.0f));
-        glUniform3fv(glGetUniformLocation(shaderID, "lightPosition"), 1, &viewSpaceLightPosition[0]);
+        //glUniform1f(glGetUniformLocation(shaderID, "kd"), wall.kd);
+        //glUniform3fv(glGetUniformLocation(shaderID, "lightColour"), 1, &lightColour[0]);
+        //glm::vec3 viewSpaceLightPosition = glm::vec3(camera.view * glm::vec4(lightPosition, 1.0f));
+        //glUniform3fv(glGetUniformLocation(shaderID, "lightPosition"), 1, &viewSpaceLightPosition[0]);
+
+        // Send multiple light source properties to the shader
+        for (unsigned int i = 0; i < static_cast<unsigned int>(lightSources.size()); i++)
+        {
+            glm::vec3 viewSpaceLightPosition = glm::vec3(camera.view * glm::vec4(lightSources[i].position, 1.0f));
+            std::string idx = std::to_string(i);
+            glUniform3fv(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].colour").c_str()), 1, &lightSources[i].colour[0]);
+            glUniform3fv(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].position").c_str()), 1, &viewSpaceLightPosition[0]);
+            glUniform1f(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].constant").c_str()), lightSources[i].constant);
+            glUniform1f(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].linear").c_str()), lightSources[i].linear);
+            glUniform1f(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].quadratic").c_str()), lightSources[i].quadratic);
+            glUniform1i(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].type").c_str()), lightSources[i].type);
+        }
+
+        // Send object lighting properties to the fragment shader
+        glUniform1f(glGetUniformLocation(shaderID, "ka"), cube.ka);
+        glUniform1f(glGetUniformLocation(shaderID, "kd"), cube.kd);
+        glUniform1f(glGetUniformLocation(shaderID, "ks"), cube.ks);
+        glUniform1f(glGetUniformLocation(shaderID, "Ns"), cube.Ns);
 
         // Loop through objects
         for (unsigned int i = 0; i < static_cast<unsigned int>(objects.size()); i++)
@@ -334,8 +379,42 @@ int main(void)
                 ceiling.draw(shaderID);
         }
 
+        for (unsigned int i = 0; i < static_cast<unsigned int>(lightSources.size()); i++)
+        {
+            // Calculate model matrix
+            glm::mat4 translate = Maths::translate(lightSources[i].position);
+            glm::mat4 scale = Maths::scale(glm::vec3(0.1f));
+            glm::mat4 model = translate * scale;
+
+            // Send the MVP and MV matrices to the vertex shader
+            glm::mat4 MVP = camera.projection * camera.view * model;
+            glUniformMatrix4fv(glGetUniformLocation(lightShaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+
+            // Send model, view, projection matrices and light colour to light shader
+            glUniform3fv(glGetUniformLocation(lightShaderID, "lightColour"), 1, &lightSources[i].colour[0]);
+
+            // Draw light source
+            sphere.draw(lightShaderID);
+        }
+
         // Draw light sources
-        lightSources.draw(lightShaderID, camera.view, camera.projection, sphere);
+// Activate light source shader
+        glUseProgram(lightShaderID);
+
+        //// Calculate model matrix
+        //glm::mat4 translate = Maths::translate(lightPosition);
+        //glm::mat4 scale = Maths::scale(glm::vec3(0.1f));
+        //glm::mat4 model = translate * scale;
+
+        //// Send the MVP and MV matrices to the vertex shader
+        //glm::mat4 MVP = camera.projection * camera.view * model;
+        //glUniformMatrix4fv(glGetUniformLocation(lightShaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+
+        //// Send model, view, projection matrices and light colour to light shader
+        //glUniform3fv(glGetUniformLocation(lightShaderID, "lightColour"), 1, &lightColour[0]);
+
+        //// Draw light source
+        //sphere.draw(lightShaderID);
 
         // Swap buffers
         glfwSwapBuffers(window);
