@@ -112,10 +112,6 @@ int main(void)
     cube.ks = 0.5f;
     cube.Ns = 20.0f;
 
-    // Add light sources
-    Light lightSources;
-    lightSources.addDirectionalLight(glm::vec3(1.0f, -1.0f, 0.0f),  // direction
-        glm::vec3(1.0f, 1.0f, 0.0f));  // colour
 
     // Cube positions
     glm::vec3 positions[] = {
@@ -239,6 +235,34 @@ int main(void)
     object.rotation = glm::vec3(0.0f, -1.0f, 0.0f);
     objects.push_back(object);
 
+    //// Define light source properties
+    glm::vec3 lightPosition = glm::vec3(2.0f, 2.0f, 2.0f);
+    glm::vec3 lightColour = glm::vec3(1.0f, 1.0f, 0.0f);
+
+
+
+    float constant = 1.0f;
+    float linear = 0.1f;
+    float quadratic = 0.02f;
+
+    glUniform1f(glGetUniformLocation(shaderID, "constant"), constant);
+    glUniform1f(glGetUniformLocation(shaderID, "linear"), linear);
+    glUniform1f(glGetUniformLocation(shaderID, "quadratic"), quadratic);
+
+    // Add light sources
+    Light lightSources;
+    lightSources.addPointLight(lightPosition,                       // position
+                               lightColour,                         // colour
+                               1.0f, 0.2f, 0.02f);                  // attenuation
+
+        //lightSources.addSpotLight(glm::vec3(2.0f, 2.0f, 2.0f),          // position
+        //                      glm::vec3(0.0f, -1.0f, 0.0f),         // direction
+        //                      glm::vec3(1.0f, 1.0f, 1.0f),          // colour
+        //                      1.0f, 0.1f, 0.02f,                    // attenuation
+        //                      std::cos(Maths::radians(45.0f)));     // cos(phi)
+
+    
+    
 
     //camera starting position
     camera.eye.x = 3.0f;
@@ -273,6 +297,11 @@ int main(void)
         // Send view matrix to the shader
         glUniformMatrix4fv(glGetUniformLocation(shaderID, "V"), 1, GL_FALSE, &camera.view[0][0]);
 
+        glUniform1f(glGetUniformLocation(shaderID, "kd"), wall.kd);
+        glUniform3fv(glGetUniformLocation(shaderID, "lightColour"), 1, &lightColour[0]);
+        glm::vec3 viewSpaceLightPosition = glm::vec3(camera.view * glm::vec4(lightPosition, 1.0f));
+        glUniform3fv(glGetUniformLocation(shaderID, "lightPosition"), 1, &viewSpaceLightPosition[0]);
+
         // Loop through objects
         for (unsigned int i = 0; i < static_cast<unsigned int>(objects.size()); i++)
         {
@@ -306,7 +335,7 @@ int main(void)
         }
 
         // Draw light sources
-        //lightSources.draw(lightShaderID, camera.view, camera.projection, sphere);
+        lightSources.draw(lightShaderID, camera.view, camera.projection, sphere);
 
         // Swap buffers
         glfwSwapBuffers(window);
