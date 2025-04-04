@@ -1,6 +1,6 @@
 #include <common/light.hpp>
 
-void Light::addPointLight(const glm::vec3 position, const glm::vec3 colour,
+void Lights::addPointLight(const glm::vec3 position, const glm::vec3 colour,
     const float constant, const float linear,
     const float quadratic)
 {
@@ -14,7 +14,7 @@ void Light::addPointLight(const glm::vec3 position, const glm::vec3 colour,
     lightSources.push_back(light);
 }
 
-void Light::addSpotLight(const glm::vec3 position, const glm::vec3 direction,
+void Lights::addSpotLight(const glm::vec3 position, const glm::vec3 direction,
     const glm::vec3 colour, const float constant,
     const float linear, const float quadratic,
     const float cosPhi)
@@ -31,7 +31,7 @@ void Light::addSpotLight(const glm::vec3 position, const glm::vec3 direction,
     lightSources.push_back(light);
 }
 
-void Light::addDirectionalLight(const glm::vec3 direction, const glm::vec3 colour)
+void Lights::addDirectionalLight(const glm::vec3 direction, const glm::vec3 colour)
 {
     LightSource light;
     light.direction = direction;
@@ -40,7 +40,7 @@ void Light::addDirectionalLight(const glm::vec3 direction, const glm::vec3 colou
     lightSources.push_back(light);
 }
 
-void Light::toShader(unsigned int shaderID, glm::mat4 view)
+void Lights::toShader(unsigned int shaderID, glm::mat4 view)
 {
     unsigned int numLights = static_cast<unsigned int>(lightSources.size());
     glUniform1i(glGetUniformLocation(shaderID, "numLights"), numLights);
@@ -61,7 +61,7 @@ void Light::toShader(unsigned int shaderID, glm::mat4 view)
     }
 }
 
-void Light::draw(unsigned int shaderID, glm::mat4 view, glm::mat4 projection, Model lightModel)
+void Lights::draw(unsigned int shaderID, glm::mat4 view, glm::mat4 projection, Model lightModel)
 {
     glUseProgram(shaderID);
     for (unsigned int i = 0; i < static_cast<unsigned int>(lightSources.size()); i++)

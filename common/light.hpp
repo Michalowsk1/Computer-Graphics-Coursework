@@ -15,7 +15,7 @@ struct LightSource
     unsigned int type;
 };
 
-class Light
+class Lights
 {
 public:
     std::vector<LightSource> lightSources;

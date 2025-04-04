@@ -32,18 +32,20 @@ struct Object
     std::string name;
 };
 
-// Light struct
+//light structure
 struct Light
 {
-    glm::vec3 position;
-    glm::vec3 colour;
+    vec3 position;
+    vec3 colour;
+    vec3 direction;
+    float cosPhi;
     float constant;
     float linear;
     float quadratic;
     unsigned int type;
 };
 
-// Create vector of light sources
+//Create vector of light sources
 std::vector<Light> lightSources;
 
 int main(void)
@@ -250,11 +252,9 @@ int main(void)
     objects.push_back(object);
 
     //// Define light source properties
-    glm::vec3 lightPosition = glm::vec3(2.0f, 2.0f, 2.0f);
-    glm::vec3 lightColour = glm::vec3(1.0f, 1.0f, 0.0f);
-
-
-
+    //Define light source properties
+    vec3 lightPosition = vec3(2.0f, 2.0f, 2.0f);
+    vec3 lightColour = vec3(1.0f, 1.0f, 1.0f);
     float constant = 1.0f;
     float linear = 0.1f;
     float quadratic = 0.02f;
@@ -264,7 +264,6 @@ int main(void)
     glUniform1f(glGetUniformLocation(shaderID, "quadratic"), quadratic);
 
     // Add light sources
-    Light lightSources;
     //lightSources.addPointLight(lightPosition,                       // position
     //                           lightColour,                         // colour
     //                           0.5f, 0.2f, 0.02f);                  // attenuation
@@ -286,7 +285,7 @@ int main(void)
     lightSources.push_back(light);
 
     // Add second point light source
-    light.position = glm::vec3(1.0f, 1.0f, -8.0f);
+    light.position = glm::vec3(10.0f, 2.0f, 2.0f);
     lightSources.push_back(light);
     
 
@@ -310,12 +309,12 @@ int main(void)
         glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Activate shader
+        glUseProgram(shaderID);
+
         // Calculate view and projection matrices
         camera.target = camera.eye + camera.front;
         camera.quaternionCamera();
-
-        // Activate shader
-        glUseProgram(shaderID);
 
         // Send light source properties to the shader
         //lightSources.toShader(shaderID, camera.view);
@@ -339,6 +338,10 @@ int main(void)
             glUniform1f(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].linear").c_str()), lightSources[i].linear);
             glUniform1f(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].quadratic").c_str()), lightSources[i].quadratic);
             glUniform1i(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].type").c_str()), lightSources[i].type);
+
+            glm::vec3 viewSpaceLightDirection = glm::vec3(camera.view * glm::vec4(lightSources[i].direction, 0.0f));
+            glUniform3fv(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].direction").c_str()), 1, &viewSpaceLightDirection[0]);
+            glUniform1f(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].cosPhi").c_str()), lightSources[i].cosPhi);
         }
 
         // Send object lighting properties to the fragment shader
@@ -379,6 +382,8 @@ int main(void)
                 ceiling.draw(shaderID);
         }
 
+        glUseProgram(lightShaderID);
+
         for (unsigned int i = 0; i < static_cast<unsigned int>(lightSources.size()); i++)
         {
             // Calculate model matrix
@@ -397,9 +402,6 @@ int main(void)
             sphere.draw(lightShaderID);
         }
 
-        // Draw light sources
-// Activate light source shader
-        glUseProgram(lightShaderID);
 
         //// Calculate model matrix
         //glm::mat4 translate = Maths::translate(lightPosition);
