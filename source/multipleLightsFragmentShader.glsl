@@ -47,7 +47,7 @@ void main ()
         vec3 lightPosition  = lightSources[i].position;
         vec3 lightColour    = lightSources[i].colour;
         vec3 lightDirection = lightSources[i].direction;
-        float cosPhi = lightSources[i].cosPhi;
+        float cosPhi        = lightSources[i].cosPhi;
         float constant      = lightSources[i].constant;
         float linear        = lightSources[i].linear;
         float quadratic     = lightSources[i].quadratic;
@@ -125,10 +125,8 @@ vec3 spotLight(vec3 lightPosition, vec3 lightDirection, vec3 lightColour, float 
                                quadratic * distance * distance);
     
     // Directional light intensity
-    vec3 direction  = normalize(lightDirection);
-    cosTheta        = dot(-light, direction);
     float delta     = radians(2.0);
-    float intensity = clamp((cosTheta - cosPhi) / delta, 0.0, 1.0);
+float intensity = clamp((cosTheta - cosPhi) / delta, 0.0, 1.0);
     
     // Return fragment colour
     return (ambient + diffuse + specular) * attenuation * intensity;

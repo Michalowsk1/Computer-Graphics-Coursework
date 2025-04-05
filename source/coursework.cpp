@@ -20,14 +20,14 @@ float previousTime = 0.0f;  // time of previous iteration of the loop
 float deltaTime = 0.0f;  // time elapsed since the previous frame
 
 // Create camera object
-Camera camera(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+Camera camera(vec3(0.0f, 0.0f, 4.0f),vec3(0.0f, 0.0f, 0.0f));
 
 // Object struct
 struct Object
 {
-    glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 rotation = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    vec3 position = vec3(0.0f, 0.0f, 0.0f);
+    vec3 rotation =vec3(0.0f, 1.0f, 0.0f);
+    vec3 scale =vec3(1.0f, 1.0f, 1.0f);
     float angle = 0.0f;
     std::string name;
 };
@@ -130,17 +130,17 @@ int main(void)
 
 
     // Cube positions
-    glm::vec3 positions[] = {
-        glm::vec3(0.0f,  0.0f,  -5.0f),
-        glm::vec3(0.0f,  0.0f,  -4.0f),
-        glm::vec3(0.0f,  1.0f,  -4.0f),
-        glm::vec3(0.0f,  0.0f,  -3.0f),
-        glm::vec3(1.0f,  0.0f,  -4.0f),
-        glm::vec3(0.0f,  1.0f,  -5.0f),
-        glm::vec3(0.0f,  2.0f,  -5.0f),
-        glm::vec3(1.0f,  0.0f,  -5.0f),
-        glm::vec3(1.0f,  1.0f,  -5.0f),
-        glm::vec3(2.0f,  0.0f,  -5.0f),
+    vec3 positions[] = {
+        vec3(0.0f,  0.0f,  -5.0f),
+        vec3(0.0f,  0.0f,  -4.0f),
+        vec3(0.0f,  1.0f,  -4.0f),
+        vec3(0.0f,  0.0f,  -3.0f),
+        vec3(1.0f,  0.0f,  -4.0f),
+        vec3(0.0f,  1.0f,  -5.0f),
+        vec3(0.0f,  2.0f,  -5.0f),
+        vec3(1.0f,  0.0f,  -5.0f),
+        vec3(1.0f,  1.0f,  -5.0f),
+        vec3(2.0f,  0.0f,  -5.0f),
     };
 
     // Add boxes to objects vector
@@ -150,8 +150,8 @@ int main(void)
     for (unsigned int i = 0; i < 10; i++)
     {
         object.position = positions[i];
-        object.rotation = glm::vec3(1.0f, 1.0f, 1.0f);
-        object.scale = glm::vec3(0.5f, 0.5f, 0.5f);
+        object.rotation = vec3(1.0f, 1.0f, 1.0f);
+        object.scale = vec3(0.5f, 0.5f, 0.5f);
         object.angle = Maths::radians(0.0f);
         objects.push_back(object);
     }
@@ -169,9 +169,9 @@ int main(void)
     floor.ks = 0.5f;
     floor.Ns = 20.0f;
 
-    object.position = glm::vec3(7.0f, -0.5f, 2.0f);
-    object.scale = glm::vec3(0.75f, 1.0f, 0.75f);
-    object.rotation = glm::vec3(0.0f, 1.0f, 0.0f);
+    object.position = vec3(7.0f, -0.5f, 2.0f);
+    object.scale = vec3(0.75f, 1.0f, 0.75f);
+    object.rotation = vec3(0.0f, 1.0f, 0.0f);
     object.angle = 0.0f;
     object.name = "floor";
     objects.push_back(object);
@@ -194,16 +194,16 @@ int main(void)
 
 
     object.name = "wall";
-    object.position = glm::vec3(7.0f, -4.5f, -5.5f);
-    object.scale = glm::vec3(0.75f, 0.25f, 0.75f);
-    object.rotation = glm::vec3(1.0f, 0.0f, 0.0f);
+    object.position = vec3(7.0f, -2.5f, -5.5f);
+    object.scale = vec3(0.75f, 0.25f, 0.75f);
+    object.rotation = vec3(1.0f, 0.0f, 0.0f);
     object.angle = Maths::radians(90.0f);
     objects.push_back(object);
 
     object.name = "wall";
-    object.position = glm::vec3(7.0f, -4.5f, 9.5f);
-    object.scale = glm::vec3(0.75f, 0.25f, 0.75f);
-    object.rotation = glm::vec3(-1.0f, 0.0f, 0.0f);
+    object.position = vec3(7.0f, -2.5f, 9.5f);
+    object.scale = vec3(0.75f, 0.25f, 0.75f);
+    object.rotation = vec3(-1.0f, 0.0f, 0.0f);
     object.angle = Maths::radians(90.0f);
     objects.push_back(object);
 
@@ -220,16 +220,16 @@ int main(void)
     wallRotate.Ns = 20.0f;
 
     object.name = "wallRotate";
-    object.position = glm::vec3(14.5f, -4.5f, 2.0f);
-    object.scale = glm::vec3(0.75f, 0.25f, 0.75f);
-    object.rotation = glm::vec3(0.0f, 0.0f, 1.0f);
+    object.position = vec3(14.5f, -2.5f, 2.0f);
+    object.scale = vec3(0.75f, 0.25f, 0.75f);
+    object.rotation = vec3(0.0f, 0.0f, 1.0f);
     object.angle = Maths::radians(90.0f);
     objects.push_back(object);
 
     object.name = "wallRotate";
-    object.position = glm::vec3(-0.5f, -4.5f, 2.0f);
-    object.scale = glm::vec3(0.75f, 0.25f, 0.75f);
-    object.rotation = glm::vec3(0.0f, 0.0f, -1.0f);
+    object.position = vec3(-0.5f, -2.5f, 2.0f);
+    object.scale = vec3(0.75f, 0.25f, 0.75f);
+    object.rotation = vec3(0.0f, 0.0f, -1.0f);
     object.angle = Maths::radians(90.0f);
     objects.push_back(object);
 
@@ -246,12 +246,11 @@ int main(void)
     ceiling.Ns = 20.0f;
 
     object.name = "ceiling";
-    object.position = glm::vec3(7.0f, 3.0f, 2.0f);
-    object.scale = glm::vec3(8.0f, 0.1f, 8.0f);
-    object.rotation = glm::vec3(0.0f, -1.0f, 0.0f);
+    object.position = vec3(7.0f, 5.0f, 2.0f);
+    object.scale = vec3(8.0f, 0.1f, 8.0f);
+    object.rotation = vec3(0.0f, -1.0f, 0.0f);
     objects.push_back(object);
 
-    //// Define light source properties
     //Define light source properties
     vec3 lightPosition = vec3(2.0f, 2.0f, 2.0f);
     vec3 lightColour = vec3(1.0f, 1.0f, 1.0f);
@@ -263,31 +262,29 @@ int main(void)
     glUniform1f(glGetUniformLocation(shaderID, "linear"), linear);
     glUniform1f(glGetUniformLocation(shaderID, "quadratic"), quadratic);
 
-    // Add light sources
-    //lightSources.addPointLight(lightPosition,                       // position
-    //                           lightColour,                         // colour
-    //                           0.5f, 0.2f, 0.02f);                  // attenuation
-
-        //lightSources.addSpotLight(glm::vec3(2.0f, 2.0f, 2.0f),          // position
-        //                      glm::vec3(0.0f, -1.0f, 0.0f),         // direction
-        //                      glm::vec3(1.0f, 1.0f, 1.0f),          // colour
-        //                      1.0f, 0.1f, 0.02f,                    // attenuation
-        //                      std::cos(Maths::radians(45.0f)));     // cos(phi)
-
     // Add first point light source
     Light light;
-    light.position = glm::vec3(2.0f, 2.0f, 2.0f);
-    light.colour = glm::vec3(1.0f, 1.0f, 1.0f);
+    light.position = vec3(2.0f, 4.0f, 2.0f);
+    light.colour = vec3(1.0f, 1.0f, 1.0f);
     light.constant = 1.0f;
-    light.linear = 0.1f;
+    light.linear = 0.2f;
     light.quadratic = 0.02f;
     light.type = 1;
     lightSources.push_back(light);
 
-    // Add second point light source
-    light.position = glm::vec3(10.0f, 2.0f, 2.0f);
+    // Add spotlight
+    light.position = vec3(10.0f, 4.0f, 2.0f);
+    light.direction = vec3(0.5f, -1.0f, 0.5f);
+    light.colour = vec3(1.0f, 0.0f, 0.0f);
+    light.cosPhi = std::cos(Maths::radians(30.0f));
+    light.type = 2;
     lightSources.push_back(light);
-    
+
+    // Add directional light
+    light.direction = vec3(1.0f, -1.0f, 0.0f);
+    light.colour = vec3(1.0f, 1.0f, 0.0f);
+    light.type = 3;
+    lightSources.push_back(light);
 
     //camera starting position
     camera.eye.x = 3.0f;
@@ -316,21 +313,11 @@ int main(void)
         camera.target = camera.eye + camera.front;
         camera.quaternionCamera();
 
-        // Send light source properties to the shader
-        //lightSources.toShader(shaderID, camera.view);
-
-        //// Send view matrix to the shader
-        //glUniformMatrix4fv(glGetUniformLocation(shaderID, "V"), 1, GL_FALSE, &camera.view[0][0]);
-
-        //glUniform1f(glGetUniformLocation(shaderID, "kd"), wall.kd);
-        //glUniform3fv(glGetUniformLocation(shaderID, "lightColour"), 1, &lightColour[0]);
-        //glm::vec3 viewSpaceLightPosition = glm::vec3(camera.view * glm::vec4(lightPosition, 1.0f));
-        //glUniform3fv(glGetUniformLocation(shaderID, "lightPosition"), 1, &viewSpaceLightPosition[0]);
 
         // Send multiple light source properties to the shader
         for (unsigned int i = 0; i < static_cast<unsigned int>(lightSources.size()); i++)
         {
-            glm::vec3 viewSpaceLightPosition = glm::vec3(camera.view * glm::vec4(lightSources[i].position, 1.0f));
+            vec3 viewSpaceLightPosition = vec3(camera.view * vec4(lightSources[i].position, 1.0f));
             std::string idx = std::to_string(i);
             glUniform3fv(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].colour").c_str()), 1, &lightSources[i].colour[0]);
             glUniform3fv(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].position").c_str()), 1, &viewSpaceLightPosition[0]);
@@ -339,7 +326,7 @@ int main(void)
             glUniform1f(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].quadratic").c_str()), lightSources[i].quadratic);
             glUniform1i(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].type").c_str()), lightSources[i].type);
 
-            glm::vec3 viewSpaceLightDirection = glm::vec3(camera.view * glm::vec4(lightSources[i].direction, 0.0f));
+            vec3 viewSpaceLightDirection = vec3(camera.view * vec4(lightSources[i].direction, 0.0f));
             glUniform3fv(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].direction").c_str()), 1, &viewSpaceLightDirection[0]);
             glUniform1f(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].cosPhi").c_str()), lightSources[i].cosPhi);
         }
@@ -354,14 +341,14 @@ int main(void)
         for (unsigned int i = 0; i < static_cast<unsigned int>(objects.size()); i++)
         {
             // Calculate model matrix
-            glm::mat4 translate = Maths::translate(objects[i].position);
-            glm::mat4 scale = Maths::scale(objects[i].scale);
-            glm::mat4 rotate = Maths::rotate(objects[i].angle, objects[i].rotation);
-            glm::mat4 model = translate * rotate * scale;
+            mat4 translate = Maths::translate(objects[i].position);
+            mat4 scale = Maths::scale(objects[i].scale);
+            mat4 rotate = Maths::rotate(objects[i].angle, objects[i].rotation);
+            mat4 model = translate * rotate * scale;
 
             // Send the MVP and MV matrices to the vertex shader
-            glm::mat4 MV = camera.view * model;
-            glm::mat4 MVP = camera.projection * MV;
+            mat4 MV = camera.view * model;
+            mat4 MVP = camera.projection * MV;
             glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
             glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
 
@@ -387,12 +374,12 @@ int main(void)
         for (unsigned int i = 0; i < static_cast<unsigned int>(lightSources.size()); i++)
         {
             // Calculate model matrix
-            glm::mat4 translate = Maths::translate(lightSources[i].position);
-            glm::mat4 scale = Maths::scale(glm::vec3(0.1f));
-            glm::mat4 model = translate * scale;
+            mat4 translate = Maths::translate(lightSources[i].position);
+            mat4 scale = Maths::scale(vec3(0.1f));
+            mat4 model = translate * scale;
 
             // Send the MVP and MV matrices to the vertex shader
-            glm::mat4 MVP = camera.projection * camera.view * model;
+            mat4 MVP = camera.projection * camera.view * model;
             glUniformMatrix4fv(glGetUniformLocation(lightShaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
 
             // Send model, view, projection matrices and light colour to light shader
@@ -401,22 +388,6 @@ int main(void)
             // Draw light source
             sphere.draw(lightShaderID);
         }
-
-
-        //// Calculate model matrix
-        //glm::mat4 translate = Maths::translate(lightPosition);
-        //glm::mat4 scale = Maths::scale(glm::vec3(0.1f));
-        //glm::mat4 model = translate * scale;
-
-        //// Send the MVP and MV matrices to the vertex shader
-        //glm::mat4 MVP = camera.projection * camera.view * model;
-        //glUniformMatrix4fv(glGetUniformLocation(lightShaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
-
-        //// Send model, view, projection matrices and light colour to light shader
-        //glUniform3fv(glGetUniformLocation(lightShaderID, "lightColour"), 1, &lightColour[0]);
-
-        //// Draw light source
-        //sphere.draw(lightShaderID);
 
         // Swap buffers
         glfwSwapBuffers(window);
