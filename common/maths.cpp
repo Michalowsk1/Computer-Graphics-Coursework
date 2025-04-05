@@ -31,6 +31,42 @@ mat4 Maths::rotate(const float& angle, vec3 v)
 	return q.matrix();
 }
 
+float Maths::MathsLength(const vec3& object1, const vec3& object2)
+{
+	vec3 vecLength = object1 - object2;
+
+	float length = sqrt((vecLength.x * vecLength.x) + (vecLength.y * vecLength.y) + (vecLength.z * vecLength.z));
+
+	return length;
+}
+
+float Maths::MathsDot(const vec3& vec1, const vec3& vec2)
+{
+	float x = vec1.x * vec2.x;
+	float y = vec1.y * vec2.y;
+	float z = vec1.z * vec2.z;
+
+	float DotProduct = x + y + z;
+
+	return DotProduct;
+}
+
+vec3 Maths::MathsCross(const vec3& vec1, const vec3& vec2)
+{
+	float x1 = vec1.x;
+	float x2 = vec2.x;
+	float y1 = vec1.y;
+	float y2 = vec2.y;
+	float z1 = vec1.z;
+	float z2 = vec2.z;
+
+	float a = (y1 * z2) - (z1 * y2);
+	float b = (z1 * x2) - (x1 * z2);
+	float c = (x1 * y2) - (y1 * x2);
+
+	return vec3(a, b, c);
+}
+
 
 Quaternion::Quaternion() {}
 

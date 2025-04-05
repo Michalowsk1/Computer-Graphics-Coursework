@@ -141,13 +141,14 @@ int main(void)
         vec3(1.0f,  0.0f,  -5.0f),
         vec3(1.0f,  1.0f,  -5.0f),
         vec3(2.0f,  0.0f,  -5.0f),
+        vec3(5.0f,  0.0f,  -10.0f),
     };
 
     // Add boxes to objects vector
     std::vector<Object> objects;
     Object object;
     object.name = "cube";
-    for (unsigned int i = 0; i < 10; i++)
+    for (unsigned int i = 0; i < 11; i++)
     {
         object.position = positions[i];
         object.rotation = vec3(1.0f, 1.0f, 1.0f);
@@ -388,6 +389,9 @@ int main(void)
             // Draw light source
             sphere.draw(lightShaderID);
         }
+
+
+        std::cout << Maths::MathsCross(vec3(4.2f,0.3f,-4.4f), vec3(14.7f,-8.3f,3.1f)) << std::endl;
 
         // Swap buffers
         glfwSwapBuffers(window);

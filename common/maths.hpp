@@ -33,7 +33,11 @@ public:
 
 	static mat4 rotate(const float& angle, vec3 v);
 
-	static mat4 view(const mat4 translate, const mat4 rotate);
+	static float MathsLength(const vec3& object1, const vec3& object2);
+
+	static float MathsDot(const vec3& vec1, const vec3& vec2);
+
+	static vec3 MathsCross(const vec3& vec1, const vec3& vec2);
 
 	static Quaternion SLERP(const Quaternion q1, const Quaternion q2, const float t);
 };
