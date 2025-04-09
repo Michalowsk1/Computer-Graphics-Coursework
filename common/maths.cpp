@@ -33,7 +33,7 @@ mat4 Maths::rotate(const float& angle, vec3 v)
 
 float Maths::MathsLength(const vec3& object1, const vec3& object2)
 {
-	vec3 vecLength = object1 - object2;
+	vec3 vecLength = object2 - object1;
 
 	float length = sqrt((vecLength.x * vecLength.x) + (vecLength.y * vecLength.y) + (vecLength.z * vecLength.z));
 

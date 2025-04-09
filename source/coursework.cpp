@@ -275,14 +275,14 @@ int main(void)
 
     // Add spotlight
     light.position = vec3(10.0f, 4.0f, 2.0f);
-    light.direction = vec3(0.5f, -1.0f, 0.5f);
+    light.direction = vec3(0.0f, -1.0f, 0.0f);
     light.colour = vec3(1.0f, 0.0f, 0.0f);
     light.cosPhi = std::cos(Maths::radians(30.0f));
     light.type = 2;
     lightSources.push_back(light);
 
     // Add directional light
-    light.direction = vec3(1.0f, -1.0f, 0.0f);
+    light.direction = vec3(0.0f, -1.0f, 0.0f);
     light.colour = vec3(1.0f, 1.0f, 0.0f);
     light.type = 3;
     lightSources.push_back(light);
@@ -389,9 +389,6 @@ int main(void)
             // Draw light source
             sphere.draw(lightShaderID);
         }
-
-
-        std::cout << Maths::MathsCross(vec3(4.2f,0.3f,-4.4f), vec3(14.7f,-8.3f,3.1f)) << std::endl;
 
         // Swap buffers
         glfwSwapBuffers(window);
