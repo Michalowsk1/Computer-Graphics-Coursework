@@ -391,8 +391,6 @@ int main(void)
         }
 
 
-        std::cout << Maths::MathsCross(vec3(4.2f,0.3f,-4.4f), vec3(14.7f,-8.3f,3.1f)) << std::endl;
-
         // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
