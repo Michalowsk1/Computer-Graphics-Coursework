@@ -48,6 +48,29 @@ struct Light
 //Create vector of light sources
 std::vector<Light> lightSources;
 
+void CheckingCollision()
+{
+    if (camera.eye.x >= 14)
+    {
+        camera.eye.x = 14;
+    }
+
+    else if (camera.eye.x <= 0)
+    {
+        camera.eye.x = 0;
+    }
+
+    if (camera.eye.z >= 9)
+    {
+        camera.eye.z = 9;
+    }
+
+    else if (camera.eye.z <= -5)
+    {
+        camera.eye.z = -5;
+    }
+}
+
 int main(void)
 {
     // =========================================================================
@@ -132,23 +155,18 @@ int main(void)
     // Cube positions
     vec3 positions[] = {
         vec3(0.0f,  0.0f,  -5.0f),
-        vec3(0.0f,  0.0f,  -4.0f),
-        vec3(0.0f,  1.0f,  -4.0f),
-        vec3(0.0f,  0.0f,  -3.0f),
-        vec3(1.0f,  0.0f,  -4.0f),
-        vec3(0.0f,  1.0f,  -5.0f),
-        vec3(0.0f,  2.0f,  -5.0f),
-        vec3(1.0f,  0.0f,  -5.0f),
-        vec3(1.0f,  1.0f,  -5.0f),
-        vec3(2.0f,  0.0f,  -5.0f),
-        vec3(5.0f,  0.0f,  -10.0f),
+        vec3(14.0f,  0.0f,  -5.0f),
+        vec3(0.0f,  0.0f,  9.0f),
+        vec3(14.0f,  0.0f,  9.0f),
+
+
     };
 
     // Add boxes to objects vector
     std::vector<Object> objects;
     Object object;
     object.name = "cube";
-    for (unsigned int i = 0; i < 11; i++)
+    for (unsigned int i = 0; i < 4; i++)
     {
         object.position = positions[i];
         object.rotation = vec3(1.0f, 1.0f, 1.0f);
@@ -265,35 +283,54 @@ int main(void)
 
     // Add first point light source
     Light light;
-    light.position = vec3(2.0f, 4.0f, 2.0f);
-    light.colour = vec3(1.0f, 1.0f, 1.0f);
-    light.constant = 1.0f;
-    light.linear = 0.2f;
-    light.quadratic = 0.02f;
-    light.type = 1;
-    lightSources.push_back(light);
+    vec3 lightPositions[] =
+    {
+        vec3(1.0f,4.0f,-4.0f),
+        vec3(13.0f,4.0f,-4.0f),
+        vec3(1.0f,4.0f,8.0f),
+        vec3(13.0f,4.0f,8.0f),
+        vec3(7.0f,4.0f,2.0f)
+    };
 
     // Add spotlight
-    light.position = vec3(10.0f, 4.0f, 2.0f);
-    light.direction = vec3(0.5f, -1.0f, 0.5f);
-    light.colour = vec3(1.0f, 0.0f, 0.0f);
-    light.cosPhi = std::cos(Maths::radians(30.0f));
-    light.type = 2;
-    lightSources.push_back(light);
+    for (unsigned int i = 0; i < 5; i++)
+    {
 
-    // Add directional light
-    light.direction = vec3(1.0f, -1.0f, 0.0f);
-    light.colour = vec3(1.0f, 1.0f, 0.0f);
-    light.type = 3;
-    lightSources.push_back(light);
+        light.position = lightPositions[i];
+        light.direction = vec3(0.0f, -1.0f, 0.0f);
+        light.colour = vec3(1.0f, 0.0f, 0.0f);
+        light.cosPhi = std::cos(Maths::radians(45.0f));
+        light.constant = 1.0f;
+        light.linear = 0.2f;
+        light.quadratic = 0.02f;
+        light.type = 2;
+
+        if (i == 4) { light.colour = vec3(1.0f, 1.0f, 1.0f); light.cosPhi = std::cos(Maths::radians(30.0f)); }
+
+        else { light.colour = vec3(1.0f, 0.0f, 0.0f); light.cosPhi = std::cos(Maths::radians(45.0f)); }
+        lightSources.push_back(light);
+    }
+    //point light
+        //light.position = vec3(2.0f, 4.0f, 2.0f);
+        //light.colour = vec3(1.0f, 1.0f, 1.0f);
+        //light.constant = 1.0f;
+        //light.linear = 0.2f;
+        //light.quadratic = 0.02f;
+        //light.type = 1;
+        //lightSources.push_back(light);
+
+
 
     //camera starting position
     camera.eye.x = 3.0f;
     camera.eye.z = 3.0f;
 
+
     // Render loop
     while (!glfwWindowShouldClose(window))
     {
+        CheckingCollision();
+
         // Update timer
         float time = glfwGetTime();
         deltaTime = time - previousTime;
@@ -389,12 +426,11 @@ int main(void)
             // Draw light source
             sphere.draw(lightShaderID);
         }
-
-
         // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
 
     // Cleanup
     cube.deleteBuffers();
@@ -452,4 +488,18 @@ void mouseInput(GLFWwindow* window)
 
     
 }
+
+bool Collisions(Object object1, Object object2) // AABB - AABB collision
+{
+
+    bool collisionX = object1.position.x + object1.scale.x >= object2.position.x && object2.position.x + object2.scale.y >= object1.position.x;
+
+    bool collisionY = object1.position.y + object1.scale.y >= object2.position.y && object2.position.y + object2.scale.y >= object1.position.y;
+
+    bool collisionZ = object1.position.z + object1.scale.z >= object2.position.z && object2.position.z + object2.scale.z >= object1.position.z;
+    return collisionX && collisionY && collisionZ;
+}
+
+
+
 

@@ -23,6 +23,7 @@ public:
     std::vector<glm::vec3> normals;
     std::vector<Texture>   textures;
     unsigned int textureID;
+
     float ka, kd, ks, Ns;
     
     // Constructor
