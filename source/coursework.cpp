@@ -10,6 +10,14 @@
 #include <common/camera.hpp>
 #include <common/model.hpp>
 #include <common/light.hpp>
+#include <common/animation.hpp>
+
+float moveSpeed = 0.0f;
+float height = 0.0f;
+float doorXValue = 0.0f;
+bool move = false;
+bool inRange = false;
+bool disco = false;
 
 // Function prototypes
 void keyboardInput(GLFWwindow* window);
@@ -21,6 +29,8 @@ float deltaTime = 0.0f;  // time elapsed since the previous frame
 
 // Create camera object
 Camera camera(vec3(0.0f, 0.0f, 4.0f),vec3(0.0f, 0.0f, 0.0f));
+
+//Animation animation;
 
 // Object struct
 struct Object
@@ -164,7 +174,9 @@ int main(void)
 
     // Add boxes to objects vector
     std::vector<Object> objects;
+    std::vector<Object> Animobjects;
     Object object;
+    Object Animobject;
     object.name = "cube";
     for (unsigned int i = 0; i < 4; i++)
     {
@@ -194,6 +206,23 @@ int main(void)
     object.angle = 0.0f;
     object.name = "floor";
     objects.push_back(object);
+
+    // Door
+
+    Model door("../assets/cube.obj");
+    door.addTexture("../assets/crate.jpg", "diffuse");
+
+    door.ka = 0.2f;
+    door.kd = 0.5f;
+    door.ks = 0.5f;
+    door.Ns = 20.0f;
+
+    Animobject.name = "door";
+    Animobject.position = vec3(7.0f, doorXValue, 2.0f);
+    Animobject.scale = vec3(0.5f, 0.5f, 0.5f);
+    Animobject.rotation = vec3(0.0f, 1.0f, 0.0f);
+    Animobject.angle = 0.0f;
+    Animobjects.push_back(Animobject);
 
     //WALL
 
@@ -292,6 +321,15 @@ int main(void)
         vec3(7.0f,4.0f,2.0f)
     };
 
+    //point light
+    light.position = vec3(2.0f, 4.0f, 2.0f);
+    light.colour = vec3(1.0f, 1.0f, 1.0f);
+    light.constant = 1.0f;
+    light.linear = 0.2f;
+    light.quadratic = 0.02f;
+    light.type = 1;
+    lightSources.push_back(light);
+
     // Add spotlight
     for (unsigned int i = 0; i < 5; i++)
     {
@@ -310,20 +348,14 @@ int main(void)
         else { light.colour = vec3(1.0f, 0.0f, 0.0f); light.cosPhi = std::cos(Maths::radians(45.0f)); }
         lightSources.push_back(light);
     }
-    //point light
-        //light.position = vec3(2.0f, 4.0f, 2.0f);
-        //light.colour = vec3(1.0f, 1.0f, 1.0f);
-        //light.constant = 1.0f;
-        //light.linear = 0.2f;
-        //light.quadratic = 0.02f;
-        //light.type = 1;
-        //lightSources.push_back(light);
+
+
 
 
 
     //camera starting position
-    camera.eye.x = 3.0f;
-    camera.eye.z = 3.0f;
+    camera.eye.x = 7.5f;
+    camera.eye.z = 8.0f;
 
 
     // Render loop
@@ -407,6 +439,72 @@ int main(void)
                 ceiling.draw(shaderID);
         }
 
+        if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+        {
+            move = true;
+        }
+
+        else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+        {
+            move = false;
+        }
+
+        else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+        {
+            inRange = true;
+        }
+
+        for (unsigned int i = 0; i < static_cast<unsigned int>(Animobjects.size()); i++)
+        {
+            if (inRange)
+            {
+                moveSpeed = -sin(glfwGetTime());
+                // Animate door
+                if (!move)
+                {
+
+                    float height = Maths::radians(moveSpeed);
+                    glm::mat4 translate = Maths::translate(glm::vec3(7.0f, 4.0, 2.0f));
+                    glm::mat4 scale = Maths::scale(glm::vec3(0.5f, 0.5f, 0.5f));
+                    mat4 model = translate * scale;
+
+                    // Send the MVP and MV matrices to the vertex shader
+                    mat4 MV = camera.view * model;
+                    mat4 MVP = camera.projection * MV;
+                    glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+                    glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
+
+
+                }
+
+                else if (move)
+                {
+                    float height = Maths::radians(moveSpeed);
+                    glm::mat4 translate = Maths::translate(vec3(7.0f, 5.75f - (height * 100.0f), 2.0f));
+                    glm::mat4 scale = Maths::scale(glm::vec3(0.5f, 0.5f, 0.5f));
+                    mat4 model = translate * scale;
+
+                    // Send the MVP and MV matrices to the vertex shader
+                    mat4 MV = camera.view * model;
+                    mat4 MVP = camera.projection * MV;
+                    glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+                    glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
+
+                    if (moveSpeed >= 0.99)
+                    {
+                        move = false;
+                    }
+
+                }
+
+                // Draw the model
+                if (Animobjects[i].name == "door")
+                    cube.draw(shaderID);
+                std::cout << moveSpeed << std::endl;
+            }
+        }
+        
+
         glUseProgram(lightShaderID);
 
         for (unsigned int i = 0; i < static_cast<unsigned int>(lightSources.size()); i++)
@@ -429,8 +527,11 @@ int main(void)
         // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
+
     }
 
+
+    std::cout << doorXValue << std::endl;
 
     // Cleanup
     cube.deleteBuffers();
@@ -468,6 +569,17 @@ void keyboardInput(GLFWwindow* window)
 
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.eye += cameraMoveSpeed * deltaTime * camera.right;
+
+    //if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+    //{
+    //    // Animate rectangle
+    //    float angle = Maths::radians(glfwGetTime() * 360.0f / 3.0f);
+    //    glm::mat4 translate = Maths::translate(glm::vec3(0.4f, doorXValue, 0.0f));
+    //    glm::mat4 scale = Maths::scale(glm::vec3(0.4f, 0.3f, 0.0f));
+    //    glm::mat4 rotate = Maths::rotate(angle, glm::vec3(0.0f, 0.0f, 1.0f));
+    //    glm::mat4 transformation = rotate * translate * scale;
+    //}
+
 }
 
 void mouseInput(GLFWwindow* window)
@@ -487,17 +599,6 @@ void mouseInput(GLFWwindow* window)
     camera.calculateCameraVectors();
 
     
-}
-
-bool Collisions(Object object1, Object object2) // AABB - AABB collision
-{
-
-    bool collisionX = object1.position.x + object1.scale.x >= object2.position.x && object2.position.x + object2.scale.y >= object1.position.x;
-
-    bool collisionY = object1.position.y + object1.scale.y >= object2.position.y && object2.position.y + object2.scale.y >= object1.position.y;
-
-    bool collisionZ = object1.position.z + object1.scale.z >= object2.position.z && object2.position.z + object2.scale.z >= object1.position.z;
-    return collisionX && collisionY && collisionZ;
 }
 
 
