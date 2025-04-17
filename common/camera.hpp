@@ -15,6 +15,8 @@ public:
 	vec3 up = vec3(0.0f, 1.0f, 0.0f);
 	vec3 front = vec3(0.0f, 0.0f, -1.0f);
 
+	vec3 offset = vec3(2.0f, 1.0f, 0.0f);
+
 	// Camera Euler angles
 	float yaw = 0.0f;
 	float pitch = 0.0f;
@@ -29,6 +31,9 @@ public:
 	mat4 view;
 	mat4 projection;
 
+	bool firstPerson = true;
+	bool thirdPerson = false;
+
 	//Quaternion camera
 	Quaternion orientation = Quaternion(pitch, yaw);
 
@@ -41,4 +46,6 @@ public:
 	void calculateCameraVectors();
 
 	void quaternionCamera();
+
+	void ThirdPersonCamera();
 };

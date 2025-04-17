@@ -35,6 +35,8 @@ float YCamPos = 1.0f;
 float heightPower = 0.0f;
 float jumpTime = 0.0f;
 
+//third-person camera
+
 // Function prototypes
 void keyboardInput(GLFWwindow* window);
 void mouseInput(GLFWwindow* window);
@@ -424,7 +426,7 @@ int main(void)
 
 
     //camera starting position
-    camera.eye.x = 1.5f;
+    camera.eye.x = 7.0f;
     camera.eye.z = 8.0f;
 
 
@@ -457,7 +459,6 @@ int main(void)
         camera.target = camera.eye + camera.front;
         camera.quaternionCamera();
 
-        std::cout << jumpTime << "     " <<   heightPower << std::endl;
         // Send multiple light source properties to the shader
         for (unsigned int i = 0; i < static_cast<unsigned int>(lightSources.size()); i++)
         {
@@ -476,10 +477,10 @@ int main(void)
         }
 
         // Send object lighting properties to the fragment shader
-        glUniform1f(glGetUniformLocation(shaderID, "ka"), wall.ka);
-        glUniform1f(glGetUniformLocation(shaderID, "kd"), wall.kd);
-        glUniform1f(glGetUniformLocation(shaderID, "ks"), wall.ks);
-        glUniform1f(glGetUniformLocation(shaderID, "Ns"), wall.Ns);
+        glUniform1f(glGetUniformLocation(shaderID, "ka"), discoBall.ka);
+        glUniform1f(glGetUniformLocation(shaderID, "kd"), discoBall.kd);
+        glUniform1f(glGetUniformLocation(shaderID, "ks"), discoBall.ks);
+        glUniform1f(glGetUniformLocation(shaderID, "Ns"), discoBall.Ns);
 
         // Loop through objects
         for (unsigned int i = 0; i < static_cast<unsigned int>(objects.size()); i++)
@@ -534,7 +535,6 @@ int main(void)
             // Draw the model
             if (Animobjects[i].name == "discoBall")
                 discoBall.draw(shaderID);
-
             }
 
         glUseProgram(lightShaderID);
@@ -602,6 +602,15 @@ void keyboardInput(GLFWwindow* window)
 
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.eye += cameraMoveSpeed * deltaTime * camera.right;
+
+    //Changing Camera Perspective
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+        camera.firstPerson = false;
+        camera.thirdPerson = true;
+
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+        camera.firstPerson = true;
+        camera.thirdPerson = false;
 
 
     //JUMP BUTTON

@@ -21,26 +21,57 @@ void Camera::calculateMatrices()
 void Camera::calculateCameraVectors()
 {
 	front = glm::vec3(cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch));
-	right = glm::normalize(glm::cross(front, worldUp));
-	up = glm::cross(right, front);
+	right = glm::normalize(Maths::MathsCross(front, worldUp));
+	up = Maths::MathsCross(right, front);
 }
 
 void Camera::quaternionCamera()
 {
-	// Calculate camera orientation quaternion from the Euler angles
-	Quaternion newOrientation(-pitch, yaw);
+	if (firstPerson)
+	{
+		// Calculate camera orientation quaternion from the Euler angles
+		Quaternion newOrientation(-pitch, yaw);
 
-	//Apply SLERP
-	orientation = Maths::SLERP(orientation, newOrientation, 0.2f);
+		//Apply SLERP
+		orientation = Maths::SLERP(orientation, newOrientation, 0.2f);
 
-	// Calculate the view matrix
-	view = orientation.matrix() * Maths::translate(-eye);
+		// Calculate the view matrix
+		view = orientation.matrix() * Maths::translate(-eye);
 
-	// Calculate the projection matrix
-	projection = glm::perspective(fov, aspect, near, far);
+		// Calculate the projection matrix
+		projection = glm::perspective(fov, aspect, near, far);
 
-	// Calculate camera vectors from view matrix
-	right = glm::vec3(view[0][0], view[1][0], view[2][0]);
-	up = glm::vec3(view[0][1], view[1][1], view[2][1]);
-	front = -glm::vec3(view[0][2], view[1][2], view[2][2]);
+		// Calculate camera vectors from view matrix
+		right = glm::vec3(view[0][0], view[1][0], view[2][0]);
+		up = glm::vec3(view[0][1], view[1][1], view[2][1]);
+		front = -glm::vec3(view[0][2], view[1][2], view[2][2]);
+
+		std::cout << view << std::endl;
+	}
+
+	else
+	{
+
+		vec3 thirdPersonCam;
+
+		vec3 offset = vec3(1.0f, 1.0f, 1.0f);
+
+		Quaternion newOrientation(-pitch, yaw);
+
+		orientation = Maths::SLERP(orientation, newOrientation, 0.2f);
+
+		thirdPersonCam = eye * offset;
+
+		view = Maths::translate(thirdPersonCam) * view;
+
+		projection = glm::perspective(fov, aspect, near, far);
+
+		// Step 7: Recalculate camera basis vectors from the new view matrix
+		right = glm::vec3(view[0][0], view[1][0], view[2][0]);
+		up = glm::vec3(view[0][1], view[1][1], view[2][1]);
+		front = -glm::vec3(view[0][2], view[1][2], view[2][2]);
+
+		std::cout << view << std::endl;
+	}
 }
+
