@@ -90,6 +90,51 @@ void CheckingCollision()
     }
 }
 
+void pressurePlateCheckers()
+{
+    if (Maths::MathsLength(camera.eye, YpressurePlateLocation) < 2.5f)
+    {
+        YMove = true;
+    }
+    else YMove = false;
+
+
+    if (YMove)
+    {
+        Ytimer = Ytimer + 0.005f;
+        XmoveSpeed = sin(Ytimer);
+        float height = Maths::radians(ZmoveSpeed);
+    }
+
+    if (Maths::MathsLength(camera.eye, XpressurePlateLocation) < 2.5f)
+    {
+        XMove = true;
+    }
+    else XMove = false;
+
+
+    if (XMove)
+    {
+        Xtimer = Xtimer + 0.005f;
+        YmoveSpeed = sin(Xtimer);
+        float height = Maths::radians(ZmoveSpeed);
+    }
+
+    if (Maths::MathsLength(camera.eye, ZpressurePlateLocation) < 2.5f)
+    {
+        ZMove = true;
+    }
+    else ZMove = false;
+
+
+    if (ZMove)
+    {
+        Ztimer = Ztimer + 0.005f;
+        ZmoveSpeed = sin(Ztimer);
+        float height = Maths::radians(ZmoveSpeed);
+    }
+}
+
 int main(void)
 {
     // =========================================================================
@@ -214,9 +259,7 @@ int main(void)
     }
     // discoball
     Model discoBall("../assets/discoBall.obj");
-    discoBall.addTexture("/assets/blue.bmp", "normal");
-    discoBall.addTexture("/assets/blue.bmp", "diffuse");
-    discoBall.addTexture("/assets/blue.bmp", "specular");
+    discoBall.addTexture("../assets/white.bmp", "diffuse");
     
 
     discoBall.ka = 0.2f;
@@ -448,32 +491,16 @@ int main(void)
             if (objects[i].name == "pressurePlate")
                 pressurePlate.draw(shaderID);
         }
-
-        if (Maths::MathsLength(camera.eye, YpressurePlateLocation) < 2.5f)
-        {
-            YMove = true;
-        }
-        else YMove = false;
-
-        if (Maths::MathsLength(camera.eye, XpressurePlateLocation) < 2.5f)
-        {
-            XMove = true;
-        }
-        else XMove = false;
-
-        if (Maths::MathsLength(camera.eye, ZpressurePlateLocation) < 2.5f)
-        {
-            ZMove = true;
-        }
-        else ZMove = false;
            
         
+        pressurePlateCheckers();
+
             //DiscoBall
             for (unsigned int i = 0; i < static_cast<unsigned int>(Animobjects.size()); i++)
             {
                 float YPos = 4.0f + sin(XmoveSpeed) * 0.5;
-                float XPos = 7.0f + sin(YmoveSpeed) * 5;
-                float ZPos = 2.0f + sin(ZmoveSpeed) * 5;
+                float XPos = 7.0f + sin(YmoveSpeed) * 8;
+                float ZPos = 2.0f + sin(ZmoveSpeed) * 8;
 
                 std::cout << XPos << "    " << YPos << "   " << ZPos << std::endl;
 
@@ -486,30 +513,6 @@ int main(void)
             mat4 MVP = camera.projection * MV;
             glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
             glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
-
-               
-            if (YMove)
-            {
-                Ytimer = Ytimer + 0.005f;
-                XmoveSpeed= sin(Ytimer);
-                float height = Maths::radians(ZmoveSpeed);
-            }
-
-            if (XMove)
-            {
-                Xtimer = Xtimer + 0.005f;
-                YmoveSpeed = sin(Xtimer);
-                float height = Maths::radians(ZmoveSpeed);
-            }
-
-            if (ZMove)
-            {
-                Ztimer = Ztimer + 0.005f;
-                ZmoveSpeed = sin(Ztimer);
-                float height = Maths::radians(ZmoveSpeed);
-            }
-
-
 
             // Draw the model
             if (Animobjects[i].name == "discoBall")
@@ -540,14 +543,14 @@ int main(void)
         glfwSwapBuffers(window);
         glfwPollEvents();
 
-
-
-        
-
     }
 
     // Cleanup
     pressurePlate.deleteBuffers();
+    wall.deleteBuffers();
+    wallRotate.deleteBuffers();
+    ceiling.deleteBuffers();
+    floor.deleteBuffers();
     glDeleteProgram(shaderID);
 
     // Close OpenGL window and terminate GLFW
@@ -558,8 +561,6 @@ int main(void)
 void keyboardInput(GLFWwindow* window)
 {
     int cameraMoveSpeed;
-
-
 
     //prevents user from flying around
     camera.eye.y = 1.0f;
@@ -607,6 +608,7 @@ void mouseInput(GLFWwindow* window)
 
     
 }
+
 
 
 
