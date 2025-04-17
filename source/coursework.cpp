@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <string>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -238,9 +239,10 @@ int main(void)
         ZpressurePlateLocation,
     };
 
+
+
     Model pressurePlate("../assets/pressurePlate.obj");
     pressurePlate.addTexture("../assets/blue.bmp", "diffuse");
-
 
     // Define floor light properties
     pressurePlate.ka = 0.2f;
@@ -412,6 +414,7 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         CheckingCollision();
+        pressurePlateCheckers();
 
         // Update timer
         float time = glfwGetTime();
@@ -491,9 +494,6 @@ int main(void)
             if (objects[i].name == "pressurePlate")
                 pressurePlate.draw(shaderID);
         }
-           
-        
-        pressurePlateCheckers();
 
             //DiscoBall
             for (unsigned int i = 0; i < static_cast<unsigned int>(Animobjects.size()); i++)
