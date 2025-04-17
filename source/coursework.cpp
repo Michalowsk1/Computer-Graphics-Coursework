@@ -29,6 +29,12 @@ vec3 YpressurePlateLocation = vec3(7.0f, -0.55f, 2.0f);
 vec3 XpressurePlateLocation = vec3(2.0f, -0.5f, -3.0f);
 vec3 ZpressurePlateLocation = vec3(12.0f, -0.5f, 7.0f);
 
+//Jump
+bool jumped = false;
+float YCamPos = 1.0f;
+float heightPower = 0.0f;
+float jumpTime = 0.0f;
+
 // Function prototypes
 void keyboardInput(GLFWwindow* window);
 void mouseInput(GLFWwindow* window);
@@ -92,6 +98,7 @@ void CheckingCollision()
 }
 
 void pressurePlateCheckers()
+
 {
     if (Maths::MathsLength(camera.eye, YpressurePlateLocation) < 2.5f)
     {
@@ -135,6 +142,15 @@ void pressurePlateCheckers()
         float height = Maths::radians(ZmoveSpeed);
     }
 }
+
+void ClampCamera()
+{
+    if (camera.pitch >= 1)
+        camera.pitch = 1;
+    if (camera.pitch < -1)
+        camera.pitch = -1;
+}
+
 
 int main(void)
 {
@@ -242,23 +258,25 @@ int main(void)
 
 
     Model pressurePlate("../assets/pressurePlate.obj");
-    pressurePlate.addTexture("../assets/blue.bmp", "diffuse");
+    pressurePlate.addTexture("../assets/white.bmp", "diffuse");
 
     // Define floor light properties
     pressurePlate.ka = 0.2f;
     pressurePlate.kd = 0.5f;
     pressurePlate.ks = 0.5f;
     pressurePlate.Ns = 20.0f;
-
-    object.name = "pressurePlate";
-    for (unsigned int i = 0; i < 3; i++)
+    object.name = "pressurePlate";   
+    for (unsigned int i = 0; i < 5; i++)
     {
+
         object.position = pressurePlateLocations[i];
         object.rotation = vec3(1.0f, 1.0f, 1.0f);
         object.scale = vec3(0.75f, 0.75f, 0.75f);
         object.angle = Maths::radians(0.0f);
+
         objects.push_back(object);
     }
+    
     // discoball
     Model discoBall("../assets/discoBall.obj");
     discoBall.addTexture("../assets/white.bmp", "diffuse");
@@ -415,6 +433,7 @@ int main(void)
     {
         CheckingCollision();
         pressurePlateCheckers();
+        ClampCamera();
 
         // Update timer
         float time = glfwGetTime();
@@ -438,7 +457,7 @@ int main(void)
         camera.target = camera.eye + camera.front;
         camera.quaternionCamera();
 
-
+        std::cout << jumpTime << "     " <<   heightPower << std::endl;
         // Send multiple light source properties to the shader
         for (unsigned int i = 0; i < static_cast<unsigned int>(lightSources.size()); i++)
         {
@@ -501,8 +520,6 @@ int main(void)
                 float YPos = 4.0f + sin(XmoveSpeed) * 0.5;
                 float XPos = 7.0f + sin(YmoveSpeed) * 8;
                 float ZPos = 2.0f + sin(ZmoveSpeed) * 8;
-
-                std::cout << XPos << "    " << YPos << "   " << ZPos << std::endl;
 
             glm::mat4 translate = Maths::translate(vec3(XPos , YPos, ZPos));
             glm::mat4 scale = Maths::scale(glm::vec3(0.5f, 0.5f, 0.5f));
@@ -587,6 +604,25 @@ void keyboardInput(GLFWwindow* window)
         camera.eye += cameraMoveSpeed * deltaTime * camera.right;
 
 
+    //JUMP BUTTON
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        jumped = true;
+
+    if (jumped)
+    {
+        jumpTime = jumpTime + 0.025f;
+
+        heightPower = sin(jumpTime);
+
+        camera.eye.y = 1 + heightPower;
+
+        if (camera.eye.y <= 1)
+        {
+            jumped = false;
+            jumpTime = 0;
+        }
+    }
+    
 
 }
 
