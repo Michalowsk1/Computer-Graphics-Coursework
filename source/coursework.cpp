@@ -14,13 +14,14 @@
 
 //Disco Ball variables
 float moveSpeed = 0.0f;
+float timer = 1.0f;
 bool move = false;
 bool inRange = false;
 bool disco = false;
 bool onPlate = false;
 
 //pressurePlate
-vec3 pressurePlateLocation = vec3(7.0f, -0.55f, 2.0f);
+vec3 pressurePlateLocation = vec3(7.0f, -0.55f, -4.0f);
 
 // Function prototypes
 void keyboardInput(GLFWwindow* window);
@@ -340,7 +341,7 @@ int main(void)
         vec3(13.0f,4.0f,-4.0f),
         vec3(1.0f,4.0f,8.0f),
         vec3(13.0f,4.0f,8.0f),
-        vec3(7.0f,4.0f,2.0f)
+        vec3(7.0f,4.0f,-4.0f)
     };
 
     //point light
@@ -366,15 +367,13 @@ int main(void)
         light.type = 2;
 
         if (i == 4) { 
-            light.position = vec3(7.0f, 4.0f, (4.0f * moveSpeed * 1.5));
             light.colour = vec3(1.0f, 1.0f, 1.0f);
-            light.cosPhi = std::cos(Maths::radians(30.0f));
+            light.cosPhi = std::cos(Maths::radians(20.0f));
         }
 
         else { light.colour = vec3(1.0f, 0.0f, 0.0f); light.cosPhi = std::cos(Maths::radians(45.0f)); }
         lightSources.push_back(light);
     }
-
 
 
 
@@ -394,6 +393,10 @@ int main(void)
         float offset = glfwGetTime();
         deltaTime = time - previousTime;
         previousTime = time;
+
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+            timer = 0;
+
 
         // Get inputs
         keyboardInput(window);
@@ -474,18 +477,23 @@ int main(void)
         {
             inRange = true;
         }
-        else inRange = true;;
+        else inRange = false;
             
         
             //DiscoBall
             for (unsigned int i = 0; i < static_cast<unsigned int>(Animobjects.size()); i++)
             {
+                float YPos = 4.0f + sin(moveSpeed) * 0.25f;
+               
                 // Animate door
                 if (inRange)
                 {
-                    moveSpeed = sin(glfwGetTime());
+                    timer = timer + 0.005f;
+
+
+                    moveSpeed = sin(timer);
                     float height = Maths::radians(moveSpeed);
-                    glm::mat4 translate = Maths::translate(vec3(7.0f , 4.0f , (4.0f * sin(moveSpeed) * 1.5)));
+                    glm::mat4 translate = Maths::translate(vec3(7.0f , YPos, 2.0f));
                     glm::mat4 scale = Maths::scale(glm::vec3(0.5f, 0.5f, 0.5f));
                     mat4 model = translate * scale;
 
@@ -495,17 +503,28 @@ int main(void)
                     glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
                     glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
 
+                }
 
+                else if(!inRange)
+                {
+                    glm::mat4 translate = Maths::translate(vec3(7.0f, YPos, 2.0f));
+                    glm::mat4 scale = Maths::scale(glm::vec3(0.5f, 0.5f, 0.5f));
+                    mat4 model = translate * scale;
+
+                    // Send the MVP and MV matrices to the vertex shader
+                    mat4 MV = camera.view * model;
+                    mat4 MVP = camera.projection * MV;
+                    glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+                    glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
                 }
 
                 // Draw the model
                 if (Animobjects[i].name == "discoBall")
                     discoBall.draw(shaderID);
 
+                std::cout << YPos << "     " <<  moveSpeed << std::endl;
                 
             }
-       
-        
 
         glUseProgram(lightShaderID);
 
@@ -572,6 +591,7 @@ void keyboardInput(GLFWwindow* window)
 
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.eye += cameraMoveSpeed * deltaTime * camera.right;
+
 }
 
 void mouseInput(GLFWwindow* window)
