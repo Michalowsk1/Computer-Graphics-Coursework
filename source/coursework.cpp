@@ -13,15 +13,20 @@
 #include <common/animation.hpp>
 
 //Disco Ball variables
-float moveSpeed = 0.0f;
-float timer = 1.0f;
-bool move = false;
-bool inRange = false;
-bool disco = false;
-bool onPlate = false;
+float XmoveSpeed = 0.0f;
+float YmoveSpeed = 0.0f;
+float ZmoveSpeed = 0.0f;
+float Xtimer = 0.0f;
+float Ytimer = 0.0f;
+float Ztimer = 0.0f;
+bool YMove = false;
+bool XMove = false;
+bool ZMove = false;
 
-//pressurePlate
-vec3 pressurePlateLocation = vec3(7.0f, -0.55f, -4.0f);
+//pressurePlates
+vec3 YpressurePlateLocation = vec3(7.0f, -0.55f, 2.0f);
+vec3 XpressurePlateLocation = vec3(2.0f, -0.5f, -3.0f);
+vec3 ZpressurePlateLocation = vec3(12.0f, -0.5f, 7.0f);
 
 // Function prototypes
 void keyboardInput(GLFWwindow* window);
@@ -151,45 +156,13 @@ int main(void)
     // Activate shader
     glUseProgram(shaderID);
 
-    // Load models
-    Model cube("../assets/cube.obj");
-    Model sphere("../assets/sphere.obj");
-
-
-    // Load the textures
-    cube.addTexture("../assets/crate.jpg", "diffuse");
-
-    // Define cube object lighting properties
-    cube.ka = 0.2f;
-    cube.kd = 0.5f;
-    cube.ks = 0.5f;
-    cube.Ns = 20.0f;
-
-
-    // Cube positions
-    vec3 positions[] = {
-        vec3(0.0f,  0.0f,  -5.0f),
-        vec3(14.0f,  0.0f,  -5.0f),
-        vec3(0.0f,  0.0f,  9.0f),
-        vec3(14.0f,  0.0f,  9.0f),
-
-
-    };
-
     // Add boxes to objects vector
     std::vector<Object> objects;
     std::vector<Object> Animobjects;
     Object object;
     Object Animobject;
-    object.name = "cube";
-    for (unsigned int i = 0; i < 4; i++)
-    {
-        object.position = positions[i];
-        object.rotation = vec3(1.0f, 1.0f, 1.0f);
-        object.scale = vec3(0.5f, 0.5f, 0.5f);
-        object.angle = Maths::radians(0.0f);
-        objects.push_back(object);
-    }
+
+    Model sphere("../assets/sphere.obj");
 
     // FLOOR
 
@@ -213,6 +186,13 @@ int main(void)
 
     // PressurePlate
 
+    vec3 pressurePlateLocations[] =
+    {
+        XpressurePlateLocation,
+        YpressurePlateLocation,
+        ZpressurePlateLocation,
+    };
+
     Model pressurePlate("../assets/pressurePlate.obj");
     pressurePlate.addTexture("../assets/blue.bmp", "diffuse");
 
@@ -223,13 +203,15 @@ int main(void)
     pressurePlate.ks = 0.5f;
     pressurePlate.Ns = 20.0f;
 
-    object.position = pressurePlateLocation;
-    object.scale = vec3(0.75f, 1.0f, 0.75f);
-    object.rotation = vec3(0.0f, 1.0f, 0.0f);
-    object.angle = 0.0f;
     object.name = "pressurePlate";
-    objects.push_back(object);
-
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        object.position = pressurePlateLocations[i];
+        object.rotation = vec3(1.0f, 1.0f, 1.0f);
+        object.scale = vec3(0.75f, 0.75f, 0.75f);
+        object.angle = Maths::radians(0.0f);
+        objects.push_back(object);
+    }
     // discoball
     Model discoBall("../assets/discoBall.obj");
     discoBall.addTexture("/assets/blue.bmp", "normal");
@@ -337,18 +319,18 @@ int main(void)
     Light light;
     vec3 lightPositions[] =
     {
-        vec3(1.0f,4.0f,-4.0f),
-        vec3(13.0f,4.0f,-4.0f),
-        vec3(1.0f,4.0f,8.0f),
-        vec3(13.0f,4.0f,8.0f),
-        vec3(7.0f,4.0f,-4.0f)
+        vec3(2.0f,4.0f,-3.0f),
+        vec3(12.0f,4.0f,-3.0f),
+        vec3(2.0f,4.0f,7.0f),
+        vec3(12.0f,4.0f,7.0f),
+        vec3(7.0f,4.0f,2.0f)
     };
 
     //point light
     light.position = vec3(7.0f, 4.0f, 2.0f);
     light.colour = vec3(1.0f, 1.0f, 1.0f);
     light.constant = 1.0f;
-    light.linear = 0.2f;
+    light.linear = 0.1f;
     light.quadratic = 0.02f;
     light.type = 1;
     lightSources.push_back(light);
@@ -356,30 +338,30 @@ int main(void)
     // Add spotlight
     for (unsigned int i = 0; i < 5; i++)
     {
-        moveSpeed = sin(glfwGetTime());
         light.position = lightPositions[i];
         light.direction = vec3(0.0f, -1.0f, 0.0f);
         light.colour = vec3(1.0f, 0.0f, 0.0f);
-        light.cosPhi = std::cos(Maths::radians(45.0f));
+        light.cosPhi = std::cos(Maths::radians(30.0f));
         light.constant = 1.0f;
         light.linear = 0.2f;
         light.quadratic = 0.02f;
         light.type = 2;
 
-        if (i == 4) { 
+        if (i == 4) 
+        { 
             light.colour = vec3(1.0f, 1.0f, 1.0f);
             light.cosPhi = std::cos(Maths::radians(20.0f));
+            lightSources.push_back(light);
         }
-
-        else { light.colour = vec3(1.0f, 0.0f, 0.0f); light.cosPhi = std::cos(Maths::radians(45.0f)); }
         lightSources.push_back(light);
+
     }
 
 
 
 
     //camera starting position
-    camera.eye.x = 7.5f;
+    camera.eye.x = 1.5f;
     camera.eye.z = 8.0f;
 
 
@@ -393,9 +375,6 @@ int main(void)
         float offset = glfwGetTime();
         deltaTime = time - previousTime;
         previousTime = time;
-
-        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-            timer = 0;
 
 
         // Get inputs
@@ -432,10 +411,10 @@ int main(void)
         }
 
         // Send object lighting properties to the fragment shader
-        glUniform1f(glGetUniformLocation(shaderID, "ka"), cube.ka);
-        glUniform1f(glGetUniformLocation(shaderID, "kd"), cube.kd);
-        glUniform1f(glGetUniformLocation(shaderID, "ks"), cube.ks);
-        glUniform1f(glGetUniformLocation(shaderID, "Ns"), cube.Ns);
+        glUniform1f(glGetUniformLocation(shaderID, "ka"), wall.ka);
+        glUniform1f(glGetUniformLocation(shaderID, "kd"), wall.kd);
+        glUniform1f(glGetUniformLocation(shaderID, "ks"), wall.ks);
+        glUniform1f(glGetUniformLocation(shaderID, "Ns"), wall.Ns);
 
         // Loop through objects
         for (unsigned int i = 0; i < static_cast<unsigned int>(objects.size()); i++)
@@ -453,8 +432,6 @@ int main(void)
             glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
 
             // Draw the model
-            if (objects[i].name == "cube")
-                cube.draw(shaderID);
 
             if (objects[i].name == "floor")
                 floor.draw(shaderID);
@@ -472,58 +449,72 @@ int main(void)
                 pressurePlate.draw(shaderID);
         }
 
-
-        if (Maths::MathsLength(camera.eye, pressurePlateLocation) < 2.25f)
+        if (Maths::MathsLength(camera.eye, YpressurePlateLocation) < 2.5f)
         {
-            inRange = true;
+            YMove = true;
         }
-        else inRange = false;
-            
+        else YMove = false;
+
+        if (Maths::MathsLength(camera.eye, XpressurePlateLocation) < 2.5f)
+        {
+            XMove = true;
+        }
+        else XMove = false;
+
+        if (Maths::MathsLength(camera.eye, ZpressurePlateLocation) < 2.5f)
+        {
+            ZMove = true;
+        }
+        else ZMove = false;
+           
         
             //DiscoBall
             for (unsigned int i = 0; i < static_cast<unsigned int>(Animobjects.size()); i++)
             {
-                float YPos = 4.0f + sin(moveSpeed) * 0.25f;
+                float YPos = 4.0f + sin(XmoveSpeed) * 0.5;
+                float XPos = 7.0f + sin(YmoveSpeed) * 5;
+                float ZPos = 2.0f + sin(ZmoveSpeed) * 5;
+
+                std::cout << XPos << "    " << YPos << "   " << ZPos << std::endl;
+
+            glm::mat4 translate = Maths::translate(vec3(XPos , YPos, ZPos));
+            glm::mat4 scale = Maths::scale(glm::vec3(0.5f, 0.5f, 0.5f));
+            mat4 model = translate * scale;
+
+            // Send the MVP and MV matrices to the vertex shader
+            mat4 MV = camera.view * model;
+            mat4 MVP = camera.projection * MV;
+            glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+            glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
+
                
-                // Animate door
-                if (inRange)
-                {
-                    timer = timer + 0.005f;
+            if (YMove)
+            {
+                Ytimer = Ytimer + 0.005f;
+                XmoveSpeed= sin(Ytimer);
+                float height = Maths::radians(ZmoveSpeed);
+            }
+
+            if (XMove)
+            {
+                Xtimer = Xtimer + 0.005f;
+                YmoveSpeed = sin(Xtimer);
+                float height = Maths::radians(ZmoveSpeed);
+            }
+
+            if (ZMove)
+            {
+                Ztimer = Ztimer + 0.005f;
+                ZmoveSpeed = sin(Ztimer);
+                float height = Maths::radians(ZmoveSpeed);
+            }
 
 
-                    moveSpeed = sin(timer);
-                    float height = Maths::radians(moveSpeed);
-                    glm::mat4 translate = Maths::translate(vec3(7.0f , YPos, 2.0f));
-                    glm::mat4 scale = Maths::scale(glm::vec3(0.5f, 0.5f, 0.5f));
-                    mat4 model = translate * scale;
 
-                    // Send the MVP and MV matrices to the vertex shader
-                    mat4 MV = camera.view * model;
-                    mat4 MVP = camera.projection * MV;
-                    glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
-                    glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
+            // Draw the model
+            if (Animobjects[i].name == "discoBall")
+                discoBall.draw(shaderID);
 
-                }
-
-                else if(!inRange)
-                {
-                    glm::mat4 translate = Maths::translate(vec3(7.0f, YPos, 2.0f));
-                    glm::mat4 scale = Maths::scale(glm::vec3(0.5f, 0.5f, 0.5f));
-                    mat4 model = translate * scale;
-
-                    // Send the MVP and MV matrices to the vertex shader
-                    mat4 MV = camera.view * model;
-                    mat4 MVP = camera.projection * MV;
-                    glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
-                    glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
-                }
-
-                // Draw the model
-                if (Animobjects[i].name == "discoBall")
-                    discoBall.draw(shaderID);
-
-                std::cout << YPos << "     " <<  moveSpeed << std::endl;
-                
             }
 
         glUseProgram(lightShaderID);
@@ -556,7 +547,7 @@ int main(void)
     }
 
     // Cleanup
-    cube.deleteBuffers();
+    pressurePlate.deleteBuffers();
     glDeleteProgram(shaderID);
 
     // Close OpenGL window and terminate GLFW
@@ -567,6 +558,8 @@ int main(void)
 void keyboardInput(GLFWwindow* window)
 {
     int cameraMoveSpeed;
+
+
 
     //prevents user from flying around
     camera.eye.y = 1.0f;
@@ -591,6 +584,8 @@ void keyboardInput(GLFWwindow* window)
 
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.eye += cameraMoveSpeed * deltaTime * camera.right;
+
+
 
 }
 
