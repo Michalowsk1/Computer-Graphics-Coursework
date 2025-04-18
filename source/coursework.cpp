@@ -36,6 +36,7 @@ float heightPower = 0.0f;
 float jumpTime = 0.0f;
 
 //third-person camera
+bool firstPerson = true;
 
 // Function prototypes
 void keyboardInput(GLFWwindow* window);
@@ -369,6 +370,22 @@ int main(void)
     object.rotation = vec3(0.0f, -1.0f, 0.0f);
     objects.push_back(object);
 
+
+    Model Monkey("../assets/monkey.obj");
+
+
+    // Define wall light properties
+    Monkey.ka = 0.2f;
+    Monkey.kd = 0.5f;
+    Monkey.ks = 0.5f;
+    Monkey.Ns = 20.0f;
+
+    Animobject.name = "monkey";
+    Animobject.position = camera.eye;
+    Animobject.scale = vec3(0.75f, 0.75f, 0.75f);
+    Animobjects.push_back(Animobject);
+
+
     //Define light source properties
     vec3 lightPosition = vec3(2.0f, 2.0f, 2.0f);
     vec3 lightColour = vec3(1.0f, 1.0f, 1.0f);
@@ -455,9 +472,18 @@ int main(void)
         // Activate shader
         glUseProgram(shaderID);
 
-        // Calculate view and projection matrices
-        camera.target = camera.eye + camera.front;
-        camera.quaternionCamera();
+        // Calculate view and projection matrices + 3RD PERSON CAMERA
+        if (firstPerson)
+        {
+            camera.target = camera.eye + camera.front;
+            camera.quaternionCamera();
+        }
+
+        else
+        {
+            camera.target = camera.eye + camera.front;
+            camera.ThirdPersonCamera();
+        }
 
         // Send multiple light source properties to the shader
         for (unsigned int i = 0; i < static_cast<unsigned int>(lightSources.size()); i++)
@@ -513,29 +539,56 @@ int main(void)
 
             if (objects[i].name == "pressurePlate")
                 pressurePlate.draw(shaderID);
+                
         }
 
             //DiscoBall
-            for (unsigned int i = 0; i < static_cast<unsigned int>(Animobjects.size()); i++)
+        for (unsigned int i = 0; i < static_cast<unsigned int>(Animobjects.size()); i++)
+        {
+            float YPos = 4.0f + sin(XmoveSpeed) * 0.5;
+            float XPos = 7.0f + sin(YmoveSpeed) * 8;
+            float ZPos = 2.0f + sin(ZmoveSpeed) * 8;
+            
+            if (Animobjects[i].name == "monkey")
             {
-                float YPos = 4.0f + sin(XmoveSpeed) * 0.5;
-                float XPos = 7.0f + sin(YmoveSpeed) * 8;
-                float ZPos = 2.0f + sin(ZmoveSpeed) * 8;
+                glm::mat4 translate = Maths::translate(vec3(camera.eye.x, camera.eye.y - 1.0f, camera.eye.z));
+                glm::mat4 scale = Maths::scale(glm::vec3(0.25f, 0.25f, 0.25f));
+                mat4 rotate = Maths::rotate(Animobjects[i].angle, Animobjects[i].rotation);
+                mat4 model = translate * rotate * scale;
 
-            glm::mat4 translate = Maths::translate(vec3(XPos , YPos, ZPos));
-            glm::mat4 scale = Maths::scale(glm::vec3(0.5f, 0.5f, 0.5f));
-            mat4 model = translate * scale;
+                mat4 MV = camera.view * model;
+                mat4 MVP = camera.projection * MV;
+                glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+                glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
+            }
 
-            // Send the MVP and MV matrices to the vertex shader
-            mat4 MV = camera.view * model;
-            mat4 MVP = camera.projection * MV;
-            glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
-            glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
+            else
+            {
+                glm::mat4 translate = Maths::translate(vec3(XPos, YPos, ZPos));
+                glm::mat4 scale = Maths::scale(glm::vec3(0.5f, 0.5f, 0.5f));
+                mat4 model = translate * scale;
+
+                mat4 MV = camera.view * model;
+                mat4 MVP = camera.projection * MV;
+                glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+                glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
+            }
+
+            
+
 
             // Draw the model
             if (Animobjects[i].name == "discoBall")
                 discoBall.draw(shaderID);
+
+            if (!firstPerson)
+            {
+                if (Animobjects[i].name == "monkey")
+                {
+                    Monkey.draw(shaderID);
+                }
             }
+        }
 
         glUseProgram(lightShaderID);
 
@@ -605,12 +658,10 @@ void keyboardInput(GLFWwindow* window)
 
     //Changing Camera Perspective
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-        camera.firstPerson = false;
-        camera.thirdPerson = true;
+        firstPerson = false;
 
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-        camera.firstPerson = true;
-        camera.thirdPerson = false;
+        firstPerson = true;
 
 
     //JUMP BUTTON

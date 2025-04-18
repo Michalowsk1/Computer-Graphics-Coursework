@@ -31,8 +31,6 @@ public:
 	mat4 view;
 	mat4 projection;
 
-	bool firstPerson = true;
-	bool thirdPerson = false;
 
 	//Quaternion camera
 	Quaternion orientation = Quaternion(pitch, yaw);

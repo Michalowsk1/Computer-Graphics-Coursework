@@ -27,8 +27,6 @@ void Camera::calculateCameraVectors()
 
 void Camera::quaternionCamera()
 {
-	if (firstPerson)
-	{
 		// Calculate camera orientation quaternion from the Euler angles
 		Quaternion newOrientation(-pitch, yaw);
 
@@ -47,31 +45,34 @@ void Camera::quaternionCamera()
 		front = -glm::vec3(view[0][2], view[1][2], view[2][2]);
 
 		std::cout << view << std::endl;
-	}
+	
+}
 
-	else
-	{
+void Camera::ThirdPersonCamera()
+{
 
-		vec3 thirdPersonCam;
+	vec3 thirdPersonCam;
+	vec3 playerPos = vec3(eye.x, eye.y, eye.z);
 
-		vec3 offset = vec3(1.0f, 1.0f, 1.0f);
+	vec3 desiredPos = vec3(eye.x - 2, eye.y + 1, eye.z);
 
-		Quaternion newOrientation(-pitch, yaw);
+	float scalar = Maths::MathsDot(playerPos, desiredPos);
 
-		orientation = Maths::SLERP(orientation, newOrientation, 0.2f);
+	vec3 offset = vec3(1.0f, 1.0f, 1.0f);
 
-		thirdPersonCam = eye * offset;
+	Quaternion newOrientation(-pitch, yaw);
 
-		view = Maths::translate(thirdPersonCam) * view;
+	orientation = Maths::SLERP(orientation, newOrientation, 0.2f);
 
-		projection = glm::perspective(fov, aspect, near, far);
+	view = orientation.matrix() * Maths::translate(-eye + (up * 0.1f) + (right * -2.0f));
 
-		// Step 7: Recalculate camera basis vectors from the new view matrix
-		right = glm::vec3(view[0][0], view[1][0], view[2][0]);
-		up = glm::vec3(view[0][1], view[1][1], view[2][1]);
-		front = -glm::vec3(view[0][2], view[1][2], view[2][2]);
+	projection = glm::perspective(fov, aspect, near, far);
 
-		std::cout << view << std::endl;
-	}
+	// Step 7: Recalculate camera basis vectors from the new view matrix
+	right = glm::vec3(view[0][0], view[1][0], view[2][0]);
+	up = glm::vec3(view[0][1], view[1][1], view[2][1]);
+	front = -glm::vec3(view[0][2], view[1][2], view[2][2]);
+
+	std::cout << view << std::endl;
 }
 
