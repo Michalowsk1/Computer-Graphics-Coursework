@@ -44,27 +44,25 @@ void Camera::quaternionCamera()
 		up = glm::vec3(view[0][1], view[1][1], view[2][1]);
 		front = -glm::vec3(view[0][2], view[1][2], view[2][2]);
 
-		std::cout << view << std::endl;
 	
 }
 
 void Camera::ThirdPersonCamera()
 {
+	if (pitch > 0.5)
+		pitch = 0.5;
 
-	vec3 thirdPersonCam;
-	vec3 playerPos = vec3(eye.x, eye.y, eye.z);
+	else if (pitch < -0.6)
+		pitch = -0.6;
 
-	vec3 desiredPos = vec3(eye.x - 2, eye.y + 1, eye.z);
 
-	float scalar = Maths::MathsDot(playerPos, desiredPos);
-
-	vec3 offset = vec3(1.0f, 1.0f, 1.0f);
+	vec3 offset = (up * 0.2f) + (right * -2.0f);
 
 	Quaternion newOrientation(-pitch, yaw);
 
-	orientation = Maths::SLERP(orientation, newOrientation, 0.2f);
+	orientation = Maths::SLERP(orientation, newOrientation, 1.0f);
 
-	view = orientation.matrix() * Maths::translate(-eye + (up * 0.1f) + (right * -2.0f));
+	view = orientation.matrix() * Maths::translate(-eye + offset);
 
 	projection = glm::perspective(fov, aspect, near, far);
 
@@ -73,6 +71,6 @@ void Camera::ThirdPersonCamera()
 	up = glm::vec3(view[0][1], view[1][1], view[2][1]);
 	front = -glm::vec3(view[0][2], view[1][2], view[2][2]);
 
-	std::cout << view << std::endl;
+	
 }
 

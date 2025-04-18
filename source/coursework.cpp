@@ -103,7 +103,7 @@ void CheckingCollision()
 void pressurePlateCheckers()
 
 {
-    if (Maths::MathsLength(camera.eye, YpressurePlateLocation) < 2.5f)
+    if (Maths::MathsLength(camera.eye, YpressurePlateLocation) < 2.0f)
     {
         YMove = true;
     }
@@ -117,7 +117,7 @@ void pressurePlateCheckers()
         float height = Maths::radians(ZmoveSpeed);
     }
 
-    if (Maths::MathsLength(camera.eye, XpressurePlateLocation) < 2.5f)
+    if (Maths::MathsLength(camera.eye, XpressurePlateLocation) < 2.0f)
     {
         XMove = true;
     }
@@ -131,7 +131,7 @@ void pressurePlateCheckers()
         float height = Maths::radians(ZmoveSpeed);
     }
 
-    if (Maths::MathsLength(camera.eye, ZpressurePlateLocation) < 2.5f)
+    if (Maths::MathsLength(camera.eye, ZpressurePlateLocation) < 2.0f)
     {
         ZMove = true;
     }
@@ -542,27 +542,31 @@ int main(void)
                 
         }
 
-            //DiscoBall
+            //DiscoBall & Monkey
         for (unsigned int i = 0; i < static_cast<unsigned int>(Animobjects.size()); i++)
         {
+
+            std::cout << camera.yaw << std::endl;
             float YPos = 4.0f + sin(XmoveSpeed) * 0.5;
             float XPos = 7.0f + sin(YmoveSpeed) * 8;
             float ZPos = 2.0f + sin(ZmoveSpeed) * 8;
             
-            if (Animobjects[i].name == "monkey")
+            if (Animobjects[i].name == "monkey") //lets monmkey move
             {
+                float angle = Maths::radians(57.25f * -camera.yaw);
                 glm::mat4 translate = Maths::translate(vec3(camera.eye.x, camera.eye.y - 1.0f, camera.eye.z));
                 glm::mat4 scale = Maths::scale(glm::vec3(0.25f, 0.25f, 0.25f));
-                mat4 rotate = Maths::rotate(Animobjects[i].angle, Animobjects[i].rotation);
+                glm::mat4 rotate = Maths::rotate(angle, glm::vec3(0.0f, 1.0f, 0.0f));
                 mat4 model = translate * rotate * scale;
 
                 mat4 MV = camera.view * model;
                 mat4 MVP = camera.projection * MV;
                 glUniformMatrix4fv(glGetUniformLocation(shaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
                 glUniformMatrix4fv(glGetUniformLocation(shaderID, "MV"), 1, GL_FALSE, &MV[0][0]);
+
             }
 
-            else
+            else //lets disco ball move
             {
                 glm::mat4 translate = Maths::translate(vec3(XPos, YPos, ZPos));
                 glm::mat4 scale = Maths::scale(glm::vec3(0.5f, 0.5f, 0.5f));
