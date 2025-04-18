@@ -26,10 +26,12 @@ public:
 	vec3 eye;
 	vec3 target;
 	vec3 worldUp = vec3(0.0f, 1.0f, 0.0f);
+	float varBackOffset = -2.5f;
 
 	//transformation matrices
 	mat4 view;
 	mat4 projection;
+
 
 
 	//Quaternion camera

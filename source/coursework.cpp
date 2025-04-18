@@ -37,6 +37,8 @@ float jumpTime = 0.0f;
 
 //third-person camera
 bool firstPerson = true;
+float XLook = 0.0f;
+float YLook = 0.0f;
 
 // Function prototypes
 void keyboardInput(GLFWwindow* window);
@@ -79,31 +81,31 @@ std::vector<Light> lightSources;
 
 void CheckingCollision()
 {
-    if (camera.eye.x >= 14)
-    {
-        camera.eye.x = 14;
-    }
+        if (camera.eye.x >= 14)
+        {
+            camera.eye.x = 14;
+        }
 
-    else if (camera.eye.x <= 0)
-    {
-        camera.eye.x = 0;
-    }
+        else if (camera.eye.x <= 0)
+        {
+            camera.eye.x = 0;
+        }
 
-    if (camera.eye.z >= 9)
-    {
-        camera.eye.z = 9;
-    }
+        if (camera.eye.z >= 9)
+        {
+            camera.eye.z = 9;
+        }
 
-    else if (camera.eye.z <= -5)
-    {
-        camera.eye.z = -5;
-    }
+        else if (camera.eye.z <= -5)
+        {
+            camera.eye.z = -5;
+        }
 }
 
 void pressurePlateCheckers()
 
 {
-    if (Maths::MathsLength(camera.eye, YpressurePlateLocation) < 2.0f)
+    if (Maths::MathsLength(camera.eye, YpressurePlateLocation) < 1.75f)
     {
         YMove = true;
     }
@@ -117,7 +119,7 @@ void pressurePlateCheckers()
         float height = Maths::radians(ZmoveSpeed);
     }
 
-    if (Maths::MathsLength(camera.eye, XpressurePlateLocation) < 2.0f)
+    if (Maths::MathsLength(camera.eye, XpressurePlateLocation) < 1.75f)
     {
         XMove = true;
     }
@@ -131,7 +133,7 @@ void pressurePlateCheckers()
         float height = Maths::radians(ZmoveSpeed);
     }
 
-    if (Maths::MathsLength(camera.eye, ZpressurePlateLocation) < 2.0f)
+    if (Maths::MathsLength(camera.eye, ZpressurePlateLocation) < 1.75f)
     {
         ZMove = true;
     }
@@ -231,7 +233,7 @@ int main(void)
 
     // FLOOR
 
-    Model floor("../assets/plane.obj");
+    Model floor("../assets/cube.obj");
     floor.addTexture("../assets/stones_diffuse.png", "diffuse");
     floor.addTexture("../assets/stones_normal.png", "normal");
     floor.addTexture("../assets/stones_specular.png", "specular");
@@ -242,8 +244,8 @@ int main(void)
     floor.ks = 0.5f;
     floor.Ns = 20.0f;
 
-    object.position = vec3(7.0f, -0.5f, 2.0f);
-    object.scale = vec3(0.75f, 1.0f, 0.75f);
+    object.position = vec3(7.0f, -10.5f, 2.0f);
+    object.scale = vec3(7.5f, 10.0f, 7.5f);
     object.rotation = vec3(0.0f, 1.0f, 0.0f);
     object.angle = 0.0f;
     object.name = "floor";
@@ -299,10 +301,18 @@ int main(void)
 
     //WALL
 
-    Model wall("../assets/plane.obj");
-    wall.addTexture("../assets/bricks_diffuse.png", "diffuse");
-    wall.addTexture("../assets/bricks_normal.png", "normal");
-    wall.addTexture("../assets/bricks_specular.png", "specular");
+    vec3 WallLocations[] =
+    {
+        vec3(7.0, 2.0f, -6.0),
+        vec3(7.0, 2.0f, 10.0),
+        vec3(-1.0, 2.0f, 2.0),
+        vec3(15.0, 2.0f, 2.0),
+    };
+
+    Model wall("../assets/cube.obj");
+    wall.addTexture("../assets/bricks_diffuse_Rotated.png", "diffuse");
+    wall.addTexture("../assets/bricks_normal_Rotated.png", "normal");
+    wall.addTexture("../assets/bricks_specular_Rotateed.png", "specular");
 
 
     // Define wall light properties
@@ -311,46 +321,18 @@ int main(void)
     wall.ks = 0.5f;
     wall.Ns = 20.0f;
 
+    for (unsigned int i = 0; i < 4; i++)
+    {
+        object.name = "wall";
+        object.position = WallLocations[i];
+        object.scale = vec3(9.0f, 3.0f, 0.5f);
 
-    object.name = "wall";
-    object.position = vec3(7.0f, -2.5f, -5.5f);
-    object.scale = vec3(0.75f, 0.25f, 0.75f);
-    object.rotation = vec3(1.0f, 0.0f, 0.0f);
-    object.angle = Maths::radians(90.0f);
-    objects.push_back(object);
-
-    object.name = "wall";
-    object.position = vec3(7.0f, -2.5f, 9.5f);
-    object.scale = vec3(0.75f, 0.25f, 0.75f);
-    object.rotation = vec3(-1.0f, 0.0f, 0.0f);
-    object.angle = Maths::radians(90.0f);
-    objects.push_back(object);
-
-    Model wallRotate("../assets/plane.obj");
-    wallRotate.addTexture("../assets/bricks_diffuse_Rotated.png", "diffuse");
-    wallRotate.addTexture("../assets/bricks_normal_Rotated.png", "normal");
-    wallRotate.addTexture("../assets/bricks_specular_Rotated.png", "specular");
-
-
-    // Define wall light properties
-    wallRotate.ka = 0.2f;
-    wallRotate.kd = 0.5f;
-    wallRotate.ks = 0.5f;
-    wallRotate.Ns = 20.0f;
-
-    object.name = "wallRotate";
-    object.position = vec3(14.5f, -2.5f, 2.0f);
-    object.scale = vec3(0.75f, 0.25f, 0.75f);
-    object.rotation = vec3(0.0f, 0.0f, 1.0f);
-    object.angle = Maths::radians(90.0f);
-    objects.push_back(object);
-
-    object.name = "wallRotate";
-    object.position = vec3(-0.5f, -2.5f, 2.0f);
-    object.scale = vec3(0.75f, 0.25f, 0.75f);
-    object.rotation = vec3(0.0f, 0.0f, -1.0f);
-    object.angle = Maths::radians(90.0f);
-    objects.push_back(object);
+        if (i == 2 || i == 3)
+        {
+            object.scale = vec3(0.5f, 3.0f, 9.0);
+        }
+        objects.push_back(object);
+    }
 
     //CEILING
 
@@ -383,6 +365,7 @@ int main(void)
     Animobject.name = "monkey";
     Animobject.position = camera.eye;
     Animobject.scale = vec3(0.75f, 0.75f, 0.75f);
+    Animobject.rotation = vec3(camera.yaw * camera.pitch);
     Animobjects.push_back(Animobject);
 
 
@@ -450,6 +433,7 @@ int main(void)
     // Render loop
     while (!glfwWindowShouldClose(window))
     {
+        //own methods
         CheckingCollision();
         pressurePlateCheckers();
         ClampCamera();
@@ -477,12 +461,22 @@ int main(void)
         {
             camera.target = camera.eye + camera.front;
             camera.quaternionCamera();
+
+            std::cout << camera.eye << std::endl;
         }
 
         else
         {
             camera.target = camera.eye + camera.front;
             camera.ThirdPersonCamera();
+
+            if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) //adjusts camera
+                camera.varBackOffset += 0.01;
+
+            if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+                camera.varBackOffset -= 0.01;
+
+            std::cout << camera.view << std::endl;
         }
 
         // Send multiple light source properties to the shader
@@ -531,9 +525,6 @@ int main(void)
             if (objects[i].name == "wall")
                 wall.draw(shaderID);
 
-            if (objects[i].name == "wallRotate")
-                wallRotate.draw(shaderID);
-
             if (objects[i].name == "ceiling")
                 ceiling.draw(shaderID);
 
@@ -545,19 +536,24 @@ int main(void)
             //DiscoBall & Monkey
         for (unsigned int i = 0; i < static_cast<unsigned int>(Animobjects.size()); i++)
         {
+            //MONKEY
 
-            std::cout << camera.yaw << std::endl;
             float YPos = 4.0f + sin(XmoveSpeed) * 0.5;
             float XPos = 7.0f + sin(YmoveSpeed) * 8;
             float ZPos = 2.0f + sin(ZmoveSpeed) * 8;
+
+            XLook = camera.pitch * 100;
+            YLook = -camera.yaw * 57;
             
-            if (Animobjects[i].name == "monkey") //lets monmkey move
+            if (Animobjects[i].name == "monkey") //lets monkey move
             {
-                float angle = Maths::radians(57.25f * -camera.yaw);
-                glm::mat4 translate = Maths::translate(vec3(camera.eye.x, camera.eye.y - 1.0f, camera.eye.z));
+                float angleY = Maths::radians(YLook - (0.3 * camera.yaw)); // removes slight offset with horizontal camera movement
+                float angleX = Maths::radians(XLook);
+                glm::mat4 translate = Maths::translate(vec3(camera.eye.x, camera.eye.y - 0.75f, camera.eye.z)); //moves monkey down so player can see monkey and the scene
                 glm::mat4 scale = Maths::scale(glm::vec3(0.25f, 0.25f, 0.25f));
-                glm::mat4 rotate = Maths::rotate(angle, glm::vec3(0.0f, 1.0f, 0.0f));
-                mat4 model = translate * rotate * scale;
+                glm::mat4 rotateY = Maths::rotate(angleY, glm::vec3(0.0f, 1.0f, 0.0f));
+                glm::mat4 rotateX = Maths::rotate(angleX, glm::vec3(1.0f, 0.0f, 0.0f));
+                mat4 model = translate * rotateY * rotateX * scale;
 
                 mat4 MV = camera.view * model;
                 mat4 MVP = camera.projection * MV;
@@ -566,6 +562,7 @@ int main(void)
 
             }
 
+            //DISCOBALL
             else //lets disco ball move
             {
                 glm::mat4 translate = Maths::translate(vec3(XPos, YPos, ZPos));
@@ -622,7 +619,6 @@ int main(void)
     // Cleanup
     pressurePlate.deleteBuffers();
     wall.deleteBuffers();
-    wallRotate.deleteBuffers();
     ceiling.deleteBuffers();
     floor.deleteBuffers();
     glDeleteProgram(shaderID);
