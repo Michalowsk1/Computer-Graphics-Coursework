@@ -40,6 +40,7 @@ void Lights::addDirectionalLight(const glm::vec3 direction, const glm::vec3 colo
     lightSources.push_back(light);
 }
 
+
 void Lights::toShader(unsigned int shaderID, glm::mat4 view)
 {
     unsigned int numLights = static_cast<unsigned int>(lightSources.size());

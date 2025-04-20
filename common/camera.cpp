@@ -49,6 +49,7 @@ void Camera::quaternionCamera()
 
 void Camera::ThirdPersonCamera()
 {
+
 	if (pitch > 0.5) //limits player so he cant do full 360 spin
 		pitch = 0.5;
 
@@ -62,6 +63,7 @@ void Camera::ThirdPersonCamera()
 		varBackOffset = -3.5;
 
 	vec3 offset = (up * 0.2f) + (right * varBackOffset);
+
 
 	Quaternion newOrientation(-pitch, yaw);
 

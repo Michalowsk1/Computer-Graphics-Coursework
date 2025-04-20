@@ -40,6 +40,11 @@ bool firstPerson = true;
 float XLook = 0.0f;
 float YLook = 0.0f;
 
+//DiscoBall Variables
+float YPos = 7.0f;
+float XPos = 4.0f;
+float ZPos = 2.0f;
+
 // Function prototypes
 void keyboardInput(GLFWwindow* window);
 void mouseInput(GLFWwindow* window);
@@ -63,49 +68,40 @@ struct Object
     std::string name;
 };
 
-//light structure
-struct Light
-{
-    vec3 position;
-    vec3 colour;
-    vec3 direction;
-    float cosPhi;
-    float constant;
-    float linear;
-    float quadratic;
-    unsigned int type;
-};
-
-//Create vector of light sources
-std::vector<Light> lightSources;
-
 void CheckingCollision()
 {
-        if (camera.eye.x >= 14)
-        {
+        if (camera.eye.x >= 14) //checking collision for 1st person cam
             camera.eye.x = 14;
-        }
 
         else if (camera.eye.x <= 0)
-        {
             camera.eye.x = 0;
-        }
 
         if (camera.eye.z >= 9)
-        {
             camera.eye.z = 9;
-        }
 
         else if (camera.eye.z <= -5)
-        {
             camera.eye.z = -5;
+
+        if (!firstPerson) //checking collision for 3rd person cam
+        {
+            if (camera.eye.z > 8)
+                camera.eye.z = 8;
+
+            else if (camera.eye.z < -4)
+                camera.eye.z = -4;
+
+            if (camera.eye.x > 13)
+                camera.eye.x = 13;
+
+            else if (camera.eye.x < 1)
+                camera.eye.x = 1;
         }
 }
 
 void pressurePlateCheckers()
 
 {
-    if (Maths::MathsLength(camera.eye, YpressurePlateLocation) < 1.75f)
+    if (Maths::MathsLength(camera.eye, YpressurePlateLocation) < 2)
     {
         YMove = true;
     }
@@ -119,7 +115,7 @@ void pressurePlateCheckers()
         float height = Maths::radians(ZmoveSpeed);
     }
 
-    if (Maths::MathsLength(camera.eye, XpressurePlateLocation) < 1.75f)
+    if (Maths::MathsLength(camera.eye, XpressurePlateLocation) < 2)
     {
         XMove = true;
     }
@@ -133,7 +129,7 @@ void pressurePlateCheckers()
         float height = Maths::radians(ZmoveSpeed);
     }
 
-    if (Maths::MathsLength(camera.eye, ZpressurePlateLocation) < 1.75f)
+    if (Maths::MathsLength(camera.eye, ZpressurePlateLocation) < 2)
     {
         ZMove = true;
     }
@@ -152,8 +148,8 @@ void ClampCamera()
 {
     if (camera.pitch >= 1)
         camera.pitch = 1;
-    if (camera.pitch < -1)
-        camera.pitch = -1;
+    if (camera.pitch < -0.5)
+        camera.pitch = -0.5;
 }
 
 
@@ -207,6 +203,11 @@ int main(void)
     // Use back face culling
     glEnable(GL_CULL_FACE);
 
+    glEnable(GL_LIGHTING);
+
+    glEnable(GL_COLOR_MATERIAL);
+
+
     // Ensure we can capture keyboard inputs
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
@@ -222,6 +223,7 @@ int main(void)
 
     // Activate shader
     glUseProgram(shaderID);
+
 
     // Add boxes to objects vector
     std::vector<Object> objects;
@@ -368,20 +370,9 @@ int main(void)
     Animobject.rotation = vec3(camera.yaw * camera.pitch);
     Animobjects.push_back(Animobject);
 
-
-    //Define light source properties
-    vec3 lightPosition = vec3(2.0f, 2.0f, 2.0f);
-    vec3 lightColour = vec3(1.0f, 1.0f, 1.0f);
-    float constant = 1.0f;
-    float linear = 0.1f;
-    float quadratic = 0.02f;
-
-    glUniform1f(glGetUniformLocation(shaderID, "constant"), constant);
-    glUniform1f(glGetUniformLocation(shaderID, "linear"), linear);
-    glUniform1f(glGetUniformLocation(shaderID, "quadratic"), quadratic);
-
     // Add first point light source
-    Light light;
+    Lights light;
+    Lights movingLight;
     vec3 lightPositions[] =
     {
         vec3(2.0f,4.0f,-3.0f),
@@ -392,38 +383,18 @@ int main(void)
     };
 
     //point light
-    light.position = vec3(7.0f, 4.0f, 2.0f);
-    light.colour = vec3(1.0f, 1.0f, 1.0f);
-    light.constant = 1.0f;
-    light.linear = 0.1f;
-    light.quadratic = 0.02f;
-    light.type = 1;
-    lightSources.push_back(light);
+    light.addPointLight(vec3(XPos, YPos, ZPos), vec3(1.0f, 0.0f, 1.0f), 1.0f, 0.1f, 0.02f);
 
     // Add spotlight
     for (unsigned int i = 0; i < 5; i++)
     {
-        light.position = lightPositions[i];
-        light.direction = vec3(0.0f, -1.0f, 0.0f);
-        light.colour = vec3(1.0f, 0.0f, 0.0f);
-        light.cosPhi = std::cos(Maths::radians(30.0f));
-        light.constant = 1.0f;
-        light.linear = 0.2f;
-        light.quadratic = 0.02f;
-        light.type = 2;
+        light.addSpotLight(lightPositions[i], vec3(0.0f, -1.0f, 0.0f), glm::vec3((1.0f, 0.0f, 0.0f)), 1.0f, 0.2f, 0.02f, cos(Maths::radians(30.0f)));
 
-        if (i == 4) 
-        { 
-            light.colour = vec3(1.0f, 1.0f, 1.0f);
-            light.cosPhi = std::cos(Maths::radians(20.0f));
-            lightSources.push_back(light);
+        if (i == 4)
+        {
+            light.addSpotLight(lightPositions[4], vec3(0.0f, -1.0f, 0.0f), glm::vec3((1.0f, 1.0f, 1.0f)), 1.0f, 0.1f, 0.02f, cos(Maths::radians(30.0f)));
         }
-        lightSources.push_back(light);
-
     }
-
-
-
 
     //camera starting position
     camera.eye.x = 7.0f;
@@ -438,12 +409,19 @@ int main(void)
         pressurePlateCheckers();
         ClampCamera();
 
+        glEnable(GL_LIGHTING);
+
         // Update timer
         float time = glfwGetTime();
         float offset = glfwGetTime();
         deltaTime = time - previousTime;
         previousTime = time;
 
+        // Activate shader
+        glUseProgram(shaderID);
+
+        // Send light source properties to the shader
+        light.toShader(shaderID, camera.view);
 
         // Get inputs
         keyboardInput(window);
@@ -453,16 +431,12 @@ int main(void)
         glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Activate shader
-        glUseProgram(shaderID);
-
         // Calculate view and projection matrices + 3RD PERSON CAMERA
         if (firstPerson)
         {
             camera.target = camera.eye + camera.front;
             camera.quaternionCamera();
 
-            std::cout << camera.eye << std::endl;
         }
 
         else
@@ -476,31 +450,10 @@ int main(void)
             if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
                 camera.varBackOffset -= 0.01;
 
-            std::cout << camera.view << std::endl;
+            std::cout << camera.eye << std::endl;
+
         }
 
-        // Send multiple light source properties to the shader
-        for (unsigned int i = 0; i < static_cast<unsigned int>(lightSources.size()); i++)
-        {
-            vec3 viewSpaceLightPosition = vec3(camera.view * vec4(lightSources[i].position, 1.0f));
-            std::string idx = std::to_string(i);
-            glUniform3fv(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].colour").c_str()), 1, &lightSources[i].colour[0]);
-            glUniform3fv(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].position").c_str()), 1, &viewSpaceLightPosition[0]);
-            glUniform1f(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].constant").c_str()), lightSources[i].constant);
-            glUniform1f(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].linear").c_str()), lightSources[i].linear);
-            glUniform1f(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].quadratic").c_str()), lightSources[i].quadratic);
-            glUniform1i(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].type").c_str()), lightSources[i].type);
-
-            vec3 viewSpaceLightDirection = vec3(camera.view * vec4(lightSources[i].direction, 0.0f));
-            glUniform3fv(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].direction").c_str()), 1, &viewSpaceLightDirection[0]);
-            glUniform1f(glGetUniformLocation(shaderID, ("lightSources[" + idx + "].cosPhi").c_str()), lightSources[i].cosPhi);
-        }
-
-        // Send object lighting properties to the fragment shader
-        glUniform1f(glGetUniformLocation(shaderID, "ka"), discoBall.ka);
-        glUniform1f(glGetUniformLocation(shaderID, "kd"), discoBall.kd);
-        glUniform1f(glGetUniformLocation(shaderID, "ks"), discoBall.ks);
-        glUniform1f(glGetUniformLocation(shaderID, "Ns"), discoBall.Ns);
 
         // Loop through objects
         for (unsigned int i = 0; i < static_cast<unsigned int>(objects.size()); i++)
@@ -549,7 +502,7 @@ int main(void)
             {
                 float angleY = Maths::radians(YLook - (0.3 * camera.yaw)); // removes slight offset with horizontal camera movement
                 float angleX = Maths::radians(XLook);
-                glm::mat4 translate = Maths::translate(vec3(camera.eye.x, camera.eye.y - 0.75f, camera.eye.z)); //moves monkey down so player can see monkey and the scene
+                glm::mat4 translate = Maths::translate(vec3(camera.eye.x, (camera.eye.y - 0.75f), camera.eye.z)); //moves monkey down so player can see monkey and the scene
                 glm::mat4 scale = Maths::scale(glm::vec3(0.25f, 0.25f, 0.25f));
                 glm::mat4 rotateY = Maths::rotate(angleY, glm::vec3(0.0f, 1.0f, 0.0f));
                 glm::mat4 rotateX = Maths::rotate(angleX, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -591,25 +544,9 @@ int main(void)
             }
         }
 
-        glUseProgram(lightShaderID);
 
-        for (unsigned int i = 0; i < static_cast<unsigned int>(lightSources.size()); i++)
-        {
-            // Calculate model matrix
-            mat4 translate = Maths::translate(lightSources[i].position);
-            mat4 scale = Maths::scale(vec3(0.1f));
-            mat4 model = translate * scale;
+        light.draw(lightShaderID, camera.view, camera.projection, sphere);
 
-            // Send the MVP and MV matrices to the vertex shader
-            mat4 MVP = camera.projection * camera.view * model;
-            glUniformMatrix4fv(glGetUniformLocation(lightShaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
-
-            // Send model, view, projection matrices and light colour to light shader
-            glUniform3fv(glGetUniformLocation(lightShaderID, "lightColour"), 1, &lightSources[i].colour[0]);
-
-            // Draw light source
-            sphere.draw(lightShaderID);
-        }
         // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();

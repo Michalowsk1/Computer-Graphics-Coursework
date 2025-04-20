@@ -15,7 +15,7 @@ public:
 	vec3 up = vec3(0.0f, 1.0f, 0.0f);
 	vec3 front = vec3(0.0f, 0.0f, -1.0f);
 
-	vec3 offset = vec3(2.0f, 1.0f, 0.0f);
+
 
 	// Camera Euler angles
 	float yaw = 0.0f;
@@ -31,6 +31,9 @@ public:
 	//transformation matrices
 	mat4 view;
 	mat4 projection;
+
+	//3rd Person
+	vec3 offset = vec3(2.0f, 1.0f, 0.0f);
 
 
 

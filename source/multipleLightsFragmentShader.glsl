@@ -57,18 +57,20 @@ void main ()
             fragmentColour += pointLight(lightPosition, lightColour, constant, linear, quadratic);
 
         // Calculate spotlight
-        if (lightSources[i].type == 2)
+        if (lightSources[i].type == 2)  
             fragmentColour += spotLight(lightPosition, lightDirection, lightColour, cosPhi, constant, linear, quadratic);
 
-           // Calculate directional light
+        // Calculate directional light
         if (lightSources[i].type == 3)
             fragmentColour += directionalLight(lightDirection, lightColour);
+
+
     }
 }
 
-
 // Calculate point light
-vec3 pointLight(vec3 lightPosition, vec3 lightColour, float constant, float linear, float quadratic)
+vec3 pointLight(vec3 lightPosition, vec3 lightColour, 
+                float constant, float linear, float quadratic)
 {
     // Object colour
     vec3 objectColour = vec3(texture(diffuseMap, UV));
@@ -124,7 +126,7 @@ vec3 spotLight(vec3 lightPosition, vec3 lightDirection, vec3 lightColour, float 
     float attenuation = 1.0 / (constant + linear * distance +
                                quadratic * distance * distance);
     
-        // Directional light intensity
+    // Directional light intensity
     vec3 direction  = normalize(lightDirection);
     cosTheta        = dot(-light, direction);
     float delta     = radians(2.0);
