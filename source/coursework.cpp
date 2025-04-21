@@ -45,6 +45,11 @@ float YPos = 7.0f;
 float XPos = 4.0f;
 float ZPos = 2.0f;
 
+//moving light variables
+bool lightSpawn = false;
+int lightCount = 0;
+
+
 // Function prototypes
 void keyboardInput(GLFWwindow* window);
 void mouseInput(GLFWwindow* window);
@@ -84,17 +89,17 @@ void CheckingCollision()
 
         if (!firstPerson) //checking collision for 3rd person cam
         {
-            if (camera.eye.z > 8)
-                camera.eye.z = 8;
+            if (camera.eye.z > 7)
+                camera.eye.z = 7;
 
-            else if (camera.eye.z < -4)
-                camera.eye.z = -4;
+            else if (camera.eye.z < -3)
+                camera.eye.z = -3;
 
-            if (camera.eye.x > 13)
-                camera.eye.x = 13;
+            if (camera.eye.x > 12)
+                camera.eye.x = 12;
 
-            else if (camera.eye.x < 1)
-                camera.eye.x = 1;
+            else if (camera.eye.x < 2)
+                camera.eye.x = 2;
         }
 }
 
@@ -202,11 +207,6 @@ int main(void)
 
     // Use back face culling
     glEnable(GL_CULL_FACE);
-
-    glEnable(GL_LIGHTING);
-
-    glEnable(GL_COLOR_MATERIAL);
-
 
     // Ensure we can capture keyboard inputs
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
@@ -372,7 +372,6 @@ int main(void)
 
     // Add first point light source
     Lights light;
-    Lights movingLight;
     vec3 lightPositions[] =
     {
         vec3(2.0f,4.0f,-3.0f),
@@ -383,16 +382,16 @@ int main(void)
     };
 
     //point light
-    light.addPointLight(vec3(XPos, YPos, ZPos), vec3(1.0f, 0.0f, 1.0f), 1.0f, 0.1f, 0.02f);
+    light.addPointLight(vec3(XPos, YPos, ZPos), glm::vec3(0.0f, 0.0f, 1.0f), 1.0f, 0.0f, 0.02f);
 
     // Add spotlight
     for (unsigned int i = 0; i < 5; i++)
     {
-        light.addSpotLight(lightPositions[i], vec3(0.0f, -1.0f, 0.0f), glm::vec3((1.0f, 0.0f, 0.0f)), 1.0f, 0.2f, 0.02f, cos(Maths::radians(30.0f)));
+        light.addSpotLight(lightPositions[i], vec3(0.0f, -1.0f, 0.0f), vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.0f, 0.02f, cos(Maths::radians(30.0f)));
 
         if (i == 4)
         {
-            light.addSpotLight(lightPositions[4], vec3(0.0f, -1.0f, 0.0f), glm::vec3((1.0f, 1.0f, 1.0f)), 1.0f, 0.1f, 0.02f, cos(Maths::radians(30.0f)));
+            light.addSpotLight(lightPositions[4], vec3(0.0f, -1.0f, 0.0f), glm::vec3((1.0f, 1.0f, 1.0f)), 1.0f, 0.0f, 0.02f, cos(Maths::radians(35.0f)));
         }
     }
 
@@ -422,6 +421,13 @@ int main(void)
 
         // Send light source properties to the shader
         light.toShader(shaderID, camera.view);
+
+       
+        if ((glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) && lightCount < 5)
+        {
+            light.addPointLight(vec3(XPos, YPos, ZPos), glm::vec3(YmoveSpeed, 0.0f, sin(XmoveSpeed)), 1.0f, 0.0f, 0.02f);
+            lightCount++;
+        }
 
         // Get inputs
         keyboardInput(window);
@@ -502,7 +508,7 @@ int main(void)
             {
                 float angleY = Maths::radians(YLook - (0.3 * camera.yaw)); // removes slight offset with horizontal camera movement
                 float angleX = Maths::radians(XLook);
-                glm::mat4 translate = Maths::translate(vec3(camera.eye.x, (camera.eye.y - 0.75f), camera.eye.z)); //moves monkey down so player can see monkey and the scene
+                glm::mat4 translate = Maths::translate(vec3(camera.eye.x, (camera.eye.y - 1.2f), camera.eye.z)); //moves monkey down so player can see monkey and the scene
                 glm::mat4 scale = Maths::scale(glm::vec3(0.25f, 0.25f, 0.25f));
                 glm::mat4 rotateY = Maths::rotate(angleY, glm::vec3(0.0f, 1.0f, 0.0f));
                 glm::mat4 rotateX = Maths::rotate(angleX, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -543,7 +549,6 @@ int main(void)
                 }
             }
         }
-
 
         light.draw(lightShaderID, camera.view, camera.projection, sphere);
 

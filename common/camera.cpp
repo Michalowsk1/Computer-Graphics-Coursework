@@ -62,7 +62,7 @@ void Camera::ThirdPersonCamera()
 	else if (varBackOffset < -3.5)
 		varBackOffset = -3.5;
 
-	vec3 offset = (up * 0.2f) + (right * varBackOffset);
+	vec3 offset = (up * 0.1f) + (right * varBackOffset);
 
 
 	Quaternion newOrientation(-pitch, yaw);
