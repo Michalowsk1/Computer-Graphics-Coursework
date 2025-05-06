@@ -38,9 +38,12 @@ vec3 spotLight(vec3 lightPosition, vec3 direction, vec3 lightColour, float cosPh
 
 vec3 directionalLight(vec3 lightDirection, vec3 lightColour);
 
+
 void main ()
 {
     fragmentColour = vec3(0.0, 0.0, 0.0);
+
+
     for (int i = 0; i < maxLights; i++)
     {
         // Determine light properties for current light source
@@ -63,6 +66,7 @@ void main ()
         // Calculate directional light
         if (lightSources[i].type == 3)
             fragmentColour += directionalLight(lightDirection, lightColour);
+
 
 
     }
@@ -135,6 +139,9 @@ vec3 spotLight(vec3 lightPosition, vec3 lightDirection, vec3 lightColour, float 
     // Return fragment colour
     return (ambient + diffuse + specular) * attenuation * intensity;
 }
+
+
+
 
 
 // Calculate directional light

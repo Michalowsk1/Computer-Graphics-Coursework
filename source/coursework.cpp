@@ -48,6 +48,7 @@ float ZPos = 2.0f;
 //moving light variables
 bool lightSpawn = false;
 int lightCount = 0;
+float lightDirectionVal = 0;
 
 
 // Function prototypes
@@ -385,7 +386,7 @@ int main(void)
     light.addPointLight(vec3(XPos, YPos, ZPos), glm::vec3(0.0f, 0.0f, 1.0f), 1.0f, 0.0f, 0.02f);
 
     // Add spotlight
-    for (unsigned int i = 0; i < 5; i++)
+    for (unsigned int i = 0; i < 6; i++)
     {
         light.addSpotLight(lightPositions[i], vec3(0.0f, -1.0f, 0.0f), vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.0f, 0.02f, cos(Maths::radians(30.0f)));
 
@@ -440,6 +441,7 @@ int main(void)
         // Calculate view and projection matrices + 3RD PERSON CAMERA
         if (firstPerson)
         {
+
             camera.target = camera.eye + camera.front;
             camera.quaternionCamera();
 
@@ -456,7 +458,6 @@ int main(void)
             if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
                 camera.varBackOffset -= 0.01;
 
-            std::cout << camera.eye << std::endl;
 
         }
 
@@ -549,7 +550,6 @@ int main(void)
                 }
             }
         }
-
         light.draw(lightShaderID, camera.view, camera.projection, sphere);
 
         // Swap buffers

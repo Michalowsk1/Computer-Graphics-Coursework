@@ -67,6 +67,44 @@ vec3 Maths::MathsCross(const vec3& vec1, const vec3& vec2)
 	return vec3(a, b, c);
 }
 
+mat4 Maths::MathsLookAt(glm::vec3 eye, glm::vec3 center, glm::vec3 up) 
+{
+	vec3 Z = glm::normalize(eye - center);
+	vec3 X = glm::normalize(Maths::MathsCross(Z, up));
+	vec3 Y = Maths::MathsCross(X, Z);
+
+	glm::mat4 result;
+	result[0][0] = X.x; result[1][0] = X.y; result[2][0] = X.z;
+	result[0][1] = Y.x; result[1][1] = Y.y; result[2][1] = Y.z;
+	result[0][2] = -Z.x; result[1][2] = -Z.y; result[2][2] = -Z.z;
+	result[3][0] = -Maths::MathsDot(Y, eye);
+	result[3][1] = -Maths::MathsDot(Z, eye);
+	result[3][2] = Maths::MathsDot(X, eye);
+	return result;
+}
+
+mat4 Maths::MathsPerspective(const float fov, const float aspect, const float near, const float far)
+{
+	float top = near * (tan(fov / 2));
+
+	float right = aspect * top; 
+
+	float left = -right;
+
+	float bottom = -top;
+
+	mat4 result = {};
+
+	result[0][0] = near / right;
+	result[1][1] = near / top;
+	result[2][2] = -(far + near) / (far - near);
+	result[2][3] = -1.0f;
+	result[3][2] = -(2 * far * near) / (far - near);
+	result[3][3] = 0.0f;
+
+	return result;
+}
+
 
 Quaternion::Quaternion() {}
 

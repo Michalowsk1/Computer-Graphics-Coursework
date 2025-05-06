@@ -37,7 +37,11 @@ public:
 
 	static float MathsDot(const vec3& vec1, const vec3& vec2);
 
+	static mat4 MathsPerspective(const float fov, const float aspect, const float near, const float far);
+
 	static vec3 MathsCross(const vec3& vec1, const vec3& vec2);
+
+	static mat4 MathsLookAt(const vec3 eye, const vec3 centre, const vec3 up);
 
 	static Quaternion SLERP(const Quaternion q1, const Quaternion q2, const float t);
 };

@@ -13,19 +13,9 @@ struct LightSource
     float quadratic;
     float cosPhi;
     unsigned int type;
+    float timerVal;
 };
 
-struct MovingLightSource
-{
-    glm::vec3 position;
-    glm::vec3 colour;
-    glm::vec3 direction;
-    float constant;
-    float linear;
-    float quadratic;
-    float cosPhi;
-    unsigned int type;
-};
 
 class Lights
 {
@@ -40,6 +30,11 @@ public:
         const float quadratic);
 
     void addSpotLight(const glm::vec3 position, const glm::vec3 direction,
+        const glm::vec3 colour, const float constant,
+        const float linear, const float quadratic,
+        const float cosPhi);
+
+    void addMovingSpotLight(const glm::vec3 position, const glm::vec3 direction,
         const glm::vec3 colour, const float constant,
         const float linear, const float quadratic,
         const float cosPhi);

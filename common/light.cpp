@@ -40,6 +40,23 @@ void Lights::addDirectionalLight(const glm::vec3 direction, const glm::vec3 colo
     lightSources.push_back(light);
 }
 
+void Lights::addMovingSpotLight(const glm::vec3 position, const glm::vec3 direction,
+    const glm::vec3 colour, const float constant,
+    const float linear, const float quadratic,
+    const float cosPhi)
+{
+    LightSource light;
+    light.position = position;
+    light.direction = direction;
+    light.colour = colour;
+    light.constant = constant;
+    light.linear = linear;
+    light.quadratic = quadratic;
+    light.cosPhi = cosPhi;
+    //light.timerVal = timerVal;
+    light.type = 4;
+    lightSources.push_back(light);
+}
 
 void Lights::toShader(unsigned int shaderID, glm::mat4 view)
 {
