@@ -33,6 +33,8 @@ public:
 
 	static mat4 rotate(const float& angle, vec3 v);
 
+	static vec3 MathsNormalize(const vec3 coords);
+
 	static float MathsLength(const vec3& object1, const vec3& object2);
 
 	static float MathsDot(const vec3& vec1, const vec3& vec2);

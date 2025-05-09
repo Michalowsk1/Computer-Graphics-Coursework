@@ -1,7 +1,6 @@
 
 #include <common/maths.hpp>
 
-using namespace glm;
 mat4 Maths::translate(const vec3& v) //moving image
 {
 	mat4 translate(1.0f);
@@ -69,8 +68,8 @@ vec3 Maths::MathsCross(const vec3& vec1, const vec3& vec2)
 
 mat4 Maths::MathsLookAt(glm::vec3 eye, glm::vec3 center, glm::vec3 up) 
 {
-	vec3 Z = glm::normalize(eye - center);
-	vec3 X = glm::normalize(Maths::MathsCross(Z, up));
+	vec3 Z = Maths::MathsNormalize(eye - center);
+	vec3 X = Maths::MathsNormalize(Maths::MathsCross(Z, up));
 	vec3 Y = Maths::MathsCross(X, Z);
 
 	glm::mat4 result;
@@ -105,6 +104,12 @@ mat4 Maths::MathsPerspective(const float fov, const float aspect, const float ne
 	return result;
 }
 
+vec3 Maths::MathsNormalize(const vec3 coords)
+{
+	float denominator = (coords.x * coords.x) + (coords.y * coords.y) + (coords.z * coords.z);
+
+	return vec3((coords.x / denominator), (coords.y / denominator), (coords.z / denominator));
+}
 
 Quaternion::Quaternion() {}
 
