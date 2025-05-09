@@ -106,9 +106,12 @@ mat4 Maths::MathsPerspective(const float fov, const float aspect, const float ne
 
 vec3 Maths::MathsNormalize(const vec3 coords)
 {
-	float denominator = (coords.x * coords.x) + (coords.y * coords.y) + (coords.z * coords.z);
+	float denominator1 = (coords.x * coords.x) + (coords.y * coords.y) + (coords.z * coords.z);
+
+	float denominator = sqrt(denominator1);
 
 	return vec3((coords.x / denominator), (coords.y / denominator), (coords.z / denominator));
+
 }
 
 Quaternion::Quaternion() {}
