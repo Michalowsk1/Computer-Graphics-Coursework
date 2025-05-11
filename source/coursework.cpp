@@ -156,6 +156,7 @@ void ClampCamera()
         camera.pitch = 1;
     if (camera.pitch < -0.5)
         camera.pitch = -0.5;
+
 }
 
 
@@ -404,6 +405,7 @@ int main(void)
     // Render loop
     while (!glfwWindowShouldClose(window))
     {
+
         //own methods
         CheckingCollision();
         pressurePlateCheckers();
@@ -643,8 +645,6 @@ void mouseInput(GLFWwindow* window)
 
     // Calculate camera vectors from the yaw and pitch angles
     camera.calculateCameraVectors();
-
-    
 }
 
 

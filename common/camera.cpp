@@ -20,9 +20,9 @@ void Camera::calculateMatrices()
 
 void Camera::calculateCameraVectors()
 {
-	front = glm::vec3(cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch));
+	front = Maths::MathsNormalize(glm::vec3(cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch)));	
 	right = Maths::MathsNormalize(Maths::MathsCross(front, worldUp));
-	up = Maths::MathsCross(right, front);
+	up = Maths::MathsNormalize(Maths::MathsCross(right, front));
 
 }
 
@@ -78,7 +78,5 @@ void Camera::ThirdPersonCamera()
 	right = glm::vec3(view[0][0], view[1][0], view[2][0]);
 	up = glm::vec3(view[0][1], view[1][1], view[2][1]);
 	front = -glm::vec3(view[0][2], view[1][2], view[2][2]);
-
-	
 }
 
