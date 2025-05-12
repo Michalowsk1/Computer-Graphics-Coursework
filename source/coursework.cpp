@@ -384,7 +384,7 @@ int main(void)
     };
 
     //point light
-    light.addPointLight(vec3(XPos, YPos, ZPos), glm::vec3(0.0f, 0.0f, 1.0f), 1.0f, 0.0f, 0.02f);
+    light.addPointLight(vec3(XPos, YPos, ZPos), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 0.0f, 0.02f);
 
     // Add spotlight
     for (unsigned int i = 0; i < 6; i++)
@@ -459,8 +459,6 @@ int main(void)
 
             if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
                 camera.varBackOffset -= 0.01;
-
-
         }
 
 
@@ -552,6 +550,7 @@ int main(void)
                 }
             }
         }
+
         light.draw(lightShaderID, camera.view, camera.projection, sphere);
 
         // Swap buffers
