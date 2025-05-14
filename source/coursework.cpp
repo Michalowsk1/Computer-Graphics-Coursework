@@ -546,11 +546,6 @@ int main(void)
             }
         }
 
-        if(lightCount < 1)
-        {
-            light.addPointLight(vec3(xCamPos,3.0f,zCamPos), vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.0f, 0.05f);
-            lightCount++;
-        }
 
         light.draw(lightShaderID, camera.view, camera.projection, sphere);
 
