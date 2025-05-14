@@ -49,6 +49,8 @@ float ZPos = 2.0f;
 bool lightSpawn = false;
 int lightCount = 0;
 float lightDirectionVal = 0;
+float xCamPos = 3.0f;
+float zCamPos = 3.0f;
 
 
 // Function prototypes
@@ -425,13 +427,6 @@ int main(void)
         // Send light source properties to the shader
         light.toShader(shaderID, camera.view);
 
-       
-        if ((glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) && lightCount < 5)
-        {
-            light.addPointLight(vec3(XPos, YPos, ZPos), glm::vec3(YmoveSpeed, 0.0f, sin(XmoveSpeed)), 1.0f, 0.0f, 0.02f);
-            lightCount++;
-        }
-
         // Get inputs
         keyboardInput(window);
         mouseInput(window);
@@ -551,6 +546,12 @@ int main(void)
             }
         }
 
+        if(lightCount < 1)
+        {
+            light.addPointLight(vec3(xCamPos,3.0f,zCamPos), vec3(1.0f, 0.0f, 0.0f), 1.0f, 0.0f, 0.05f);
+            lightCount++;
+        }
+
         light.draw(lightShaderID, camera.view, camera.projection, sphere);
 
         // Swap buffers
@@ -638,8 +639,8 @@ void mouseInput(GLFWwindow* window)
     glfwSetCursorPos(window, 1024 / 2, 768 / 2);
 
     // Update yaw and pitch angles
-    camera.yaw += 0.005f * float(xPos - 1024 / 2);
-    camera.pitch += 0.005f * float(768 / 2 - yPos);
+    camera.yaw += 0.001f * float(xPos - 1024 / 2);
+    camera.pitch += 0.001f * float(768 / 2 - yPos);
 
 
     // Calculate camera vectors from the yaw and pitch angles

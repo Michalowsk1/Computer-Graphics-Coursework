@@ -21,7 +21,6 @@ class Lights
 {
 public:
     std::vector<LightSource> lightSources;
-    std::vector<LightSource> movingLightSources;
     unsigned int lightShaderID;
 
     // Add lightSources
@@ -37,7 +36,7 @@ public:
     void addMovingSpotLight(const glm::vec3 position, const glm::vec3 direction,
         const glm::vec3 colour, const float constant,
         const float linear, const float quadratic,
-        const float cosPhi);
+        const float cosPhi, const float timerVal);
 
     void addDirectionalLight(const glm::vec3 direction, const glm::vec3 colour);
 
